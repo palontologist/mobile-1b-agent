@@ -1,37 +1,83 @@
 # Roadmap: FunctionGemma 270M Stable Autonomous Agent
 
 ## Vision
-Build a stable, autonomous AI agent on mobile that provides full awareness capabilities (flashlight, calendar, notes, alarms) using FunctionGemma 270M on resource-constrained devices (3.5GB RAM SM-A14).
+Build a stable, autonomous AI agent on mobile that provides full awareness capabilities (flashlight, calendar, notes, alarms) using FunctionGemma 270M on resource-constrained devices (3.5GB RAM).
 
 ## Philosophy
 - **Stability over capability**: 270M params for 3.5G RAM vs 1B+ models that crash
 - **NPU → CPU fallback**: Graceful degradation, not hard crashes
-- **Proven starting point**: Flashlight already works, build outward
+- **Starting point**: Flashlight is the intended first skill; it is *not* yet implemented (see Known gaps)
 - **Modular actions**: Each action independent, one failure won't cascade
-- **Memory persistence**: Context survives restarts via Room/SharedPreferences
+- **Memory persistence**: Context survives restarts via SQLite/SharedPreferences
+
+## Known gaps (verified against this tree)
+
+Status after the 2026-09-24 pass:
+
+1. **Nothing has ever been compiled.** ✅ **resolved 2026-09-25.** `:app` (AGP 8.13.2 /
+   Kotlin 2.2.21 / minSdk 24 — raised from 23 because the LiteRT-LM AAR declares 24) builds: `assembleDebug` → 852KB APK, `lintDebug` → 0 errors.
+   Required fixing the SDK layout (cmdline-tools had to move to `<sdk>/cmdline-tools/latest/`),
+   installing `platforms;android-35` + `build-tools;35.0.0`, and generating the wrapper JAR.
+   The 289MB `litertlm` is still not loadable — see item 2.
+2. **No model inference in the legacy loop.** 🟡 partially resolved. The AAR
+   coordinate was *not* unresolved — it was looked up under the wrong group.
+   `com.google.ai.edge.litertlm:litertlm-android:0.16.0` serves fine (HTTP 200
+   verified 2026-10-05, and pinned by upstream's own
+   `samples/litert/qualcomm/gemma3/cpu_gpu/gradle/libs.versions.toml`). It is now
+   declared in `app/build.gradle.kts` and loaded by `ToolRoutingProbeActivity`.
+   Still open: `AgentLoop.kt` reasons through `simulateFunctionGemmaResponse`
+   rather than the model.
+
+   What wiring a real model in showed: **the 270M bundle routes tool calls at 22%
+   on this device** (4/18, 72% refusals, 3.12 s median, 983 MB peak RSS). It is not
+   a usable router. `AgentOnPhoneActivity` routes at 67% on a held-out set for
+   285 MB and 0.6 s using a 22M sentence embedder and no LLM at all. That result
+   is why the agent does not call `simulateFunctionGemmaResponse()` either.
+3. **Dangling references.** ✅ *fixed for torch*: `TorchManager` now exists and uses
+   `CameraManager.setTorchMode()`; the `TorchService` system-service cast is gone. ⬜ still
+   open in `AgentLoop.kt`: C-style ternary at :120, `ErrorLogger()` called where the nested
+   class is `ErrorLoggerImpl`, and inner classes constructed with the wrong arity.
+4. **Pasted tool transcript in a source file.** ✅ `NoteDatabase.kt` truncated to its
+   code; the 200 orphan lines that sat *after* `object ActionRegistry` closed (a second
+   draft containing Python `True`/`False`) are preserved in
+   `legacy/ActionRegistry.orphan-tail.kt.disabled` rather than deleted.
+5. **Repo hygiene.** ✅ `.gitignore` excludes model weights, build output, and the
+   delegate caches LiteRT-LM writes next to a bundle (`*.xnnpack_cache`,
+   `*mldrift*.bin`, `.litertlm-cache/` — ~277MB from the 289MB model, none of which
+   the `*.litertlm` rule caught). The 289MB `litertlm` can never be committed anyway
+   (GitHub rejects >100MB files), and the two 54-byte `model.tflite` stubs were
+   removed from the index. ✅ Apache-2.0 `LICENSE` added; the 90MB router model is
+   gitignored and fetched by `scripts/fetch_router_model.sh`.
 
 ## Milestone Timeline
 
-### M1: Foundation (Weeks 1-2) ✅ COMPLETED
+### M1: Foundation (Weeks 1-2) — partial, see blockers
 - [x] ActionRegistry.kt: 8 functions mapped to Android actions
 - [x] AgentLoop.kt: 500ms perceive→reason→act→loop with error boundaries
-- [x] AgentMemory.kt: SharedPreferences persistence (last 10 cycles)
-- [x] Python ActionRegistry logic: All 7 functions verified PASS
-- [x] LiteRT on SM-A14: XNNPACK CPU inference confirmed working
-- [x] AgentLoop stability: 8/8 iterations in simulation without error
-- [ ] Obtain FunctionGemma 270M `.litertlm` model
-- [ ] Place model in `assets/` directory
+- [x] Note persistence in SQLite (`NoteDatabase.kt`; replaced the SharedPreferences design)
+- [ ] Python ActionRegistry logic verified PASS — no harness or test file exists in this repo
+- [ ] LiteRT inference confirmed working on SM-A14 — no real model has been executed
+      (`assets/*.tflite` are 54-byte stubs that `tflite-runtime` rejects, and the Kotlin
+      loop still uses a keyword simulator at `AgentLoop.kt`)
+- [x] AgentLoop stability: 8/8 iterations **in the simulator**, not with model output
+- [x] Obtain FunctionGemma 270M `.litertlm` model (`function-gemma-q8-ekv1024.litertlm`, 289MB)
+- [x] Place model in `assets/` directory
 - [ ] (Optional) Copy NPU libraries from Gallery app
-- [ ] Build and run Android app on SM-A14
+- [ ] Build and run Android app on SM-A14 — blocked: no Gradle project or manifest existed
 - [ ] Start AgentLoop - 500ms autonomous cycle begins
 
 ### M2: Core Awareness (Weeks 3-4) 🔄 IN PROGRESS
-- [ ] Calendar integration (Google Calendar API with API key)
-- [ ] Note persistence improvement (Room/SQLite instead of file append)
-- [ ] TTS configuration and voice selection
-- [ ] Error logging and crash reporting
-- [ ] Battery optimization and throttling awareness
-- [ ] Memory management for 3.5G RAM constraint
+- [x] `CalendarService.kt` created — not tested on device, no real credentials wired
+- [x] Note persistence improvement (`NoteDatabase.kt` — SQLite)
+- [x] `TtsConfig.kt`: Text-to-Speech configuration
+- [ ] `ErrorLogger.kt` as its own file — currently only an inner class `ErrorLoggerImpl`
+      in `AgentLoop.kt`; it delegates to a top-level `ErrorLogger` that does not exist
+- [ ] `BatteryOptimizer.kt` as its own file — currently an inner class in `AgentLoop.kt`
+- [ ] AgentLoop.kt integration with all Phase 2 components
+- [ ] Calendar query test on SM-A14
+- [ ] Note append/read test on SM-A14
+- [ ] TTS speak test on SM-A14
+- [ ] Battery optimization test on SM-A14
 
 ### M3: Extended Skills (Weeks 5-6) ⏳ PLANNED
 - [ ] Media control (volume, playback)

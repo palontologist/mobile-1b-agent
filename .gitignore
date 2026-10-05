@@ -1,1 +1,54 @@
+# Python
 venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Model weights — never commit these.
+# assets/function-gemma-q8-ekv1024.litertlm is 289MB, which is above GitHub's
+# 100MB per-file hard limit, so a push containing it is rejected outright.
+*.tflite
+*.litertlm
+*.liteLM
+*.onnx
+*.gguf
+*.safetensors
+models/
+
+# Keep the directory documentation
+!assets/README.txt
+
+# Runtime delegate caches. LiteRT-LM writes XNNPACK / MLDrift caches next to the
+# bundle, sized up to ~2x the model. The 289 MB bundle in assets/ produced ~277 MB
+# of these under three different suffixes, none of which the *.litertlm rule above
+# catches because they are .xnnpack_cache / .mldrift_*.bin.
+*.xnnpack_cache
+*mldrift*.bin
+.litertlm-cache/
+
+# Android / Gradle build output
+.cxx/
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# IDE
+.idea/
+*.iml
+.fleet/
+.kotlin/
+
+# Device captures (commit only the summarized/anonymized logs)
+*.log
+captures/
+*.trace
+bugreport*
+
+# OS
+.DS_Store

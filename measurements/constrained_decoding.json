@@ -1,0 +1,326 @@
+{
+  "model": "function-gemma-q8-ekv1024.litertlm",
+  "backend": "cpu",
+  "prompts": 18,
+  "note": "constrained arm also exposed a native teardown abort in liblitert-lm with the LLGuidance provider; see converted/README note",
+  "summaries": {
+    "unconstrained": {
+      "n": 18,
+      "accuracy": 0.2778,
+      "refusal_rate": 0.7222,
+      "by_kind": {
+        "literal": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "paraphrase": {
+          "n": 13,
+          "accuracy": 0.1538
+        },
+        "terse": {
+          "n": 1,
+          "accuracy": 0.0
+        }
+      },
+      "median_seconds": 0.611
+    },
+    "constrained": {
+      "n": 16,
+      "accuracy": 0.375,
+      "refusal_rate": 0.0,
+      "by_kind": {
+        "literal": {
+          "n": 3,
+          "accuracy": 0.3333
+        },
+        "paraphrase": {
+          "n": 12,
+          "accuracy": 0.3333
+        },
+        "terse": {
+          "n": 1,
+          "accuracy": 1.0
+        }
+      },
+      "median_seconds": 0.99
+    }
+  },
+  "detail": {
+    "unconstrained": [
+      {
+        "kind": "literal",
+        "prompt": "what is on my calendar today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "ok": true,
+        "seconds": 0.484
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "whats on my calender today",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.98
+      },
+      {
+        "kind": "terse",
+        "prompt": "calendar today",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.698
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "\"what's my schedule\"",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.564
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "list my calendar events",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.606
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "do i have meetings today",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.638
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "am i busy today",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.626
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "show my events",
+        "expected": "query_calendar",
+        "got": null,
+        "ok": false,
+        "seconds": 0.643
+      },
+      {
+        "kind": "literal",
+        "prompt": "turn on the flashlight",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "ok": true,
+        "seconds": 0.384
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "i need some light in here",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "ok": true,
+        "seconds": 0.398
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "it is dark in here",
+        "expected": "open_flashlight",
+        "got": null,
+        "ok": false,
+        "seconds": 0.617
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "lights on please",
+        "expected": "open_flashlight",
+        "got": null,
+        "ok": false,
+        "seconds": 0.672
+      },
+      {
+        "kind": "literal",
+        "prompt": "turn off the flashlight",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "ok": true,
+        "seconds": 0.341
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "kill the torch now",
+        "expected": "close_flashlight",
+        "got": null,
+        "ok": false,
+        "seconds": 0.668
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "shut the light",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "ok": true,
+        "seconds": 0.361
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "no more light",
+        "expected": "close_flashlight",
+        "got": null,
+        "ok": false,
+        "seconds": 0.413
+      },
+      {
+        "kind": "literal",
+        "prompt": "take a photo",
+        "expected": "take_photo",
+        "got": null,
+        "ok": false,
+        "seconds": 0.561
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "snap a picture of the room",
+        "expected": "take_photo",
+        "got": null,
+        "ok": false,
+        "seconds": 0.643
+      }
+    ],
+    "constrained": [
+      {
+        "kind": "literal",
+        "prompt": "what is on my calendar today",
+        "expected": "query_calendar",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 1.182
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "whats on my calender today",
+        "expected": "query_calendar",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 1.201
+      },
+      {
+        "kind": "terse",
+        "prompt": "calendar today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "ok": true,
+        "seconds": 7.889
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "\"what's my schedule\"",
+        "expected": "query_calendar",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 1.169
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "list my calendar events",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "ok": true,
+        "seconds": 0.781
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "do i have meetings today",
+        "expected": "query_calendar",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 0.874
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "am i busy today",
+        "expected": "query_calendar",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 1.67
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "show my events",
+        "expected": "query_calendar",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 1.042
+      },
+      {
+        "kind": "literal",
+        "prompt": "turn on the flashlight",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "ok": true,
+        "seconds": 0.723
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "i need some light in here",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "ok": true,
+        "seconds": 0.907
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "it is dark in here",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "ok": true,
+        "seconds": 0.937
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "lights on please",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "ok": true,
+        "seconds": 0.769
+      },
+      {
+        "kind": "literal",
+        "prompt": "turn off the flashlight",
+        "expected": "close_flashlight",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 1.063
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "kill the torch now",
+        "expected": "close_flashlight",
+        "got": "take_photo",
+        "ok": false,
+        "seconds": 1.151
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "shut the light",
+        "expected": "close_flashlight",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 0.741
+      },
+      {
+        "kind": "paraphrase",
+        "prompt": "no more light",
+        "expected": "close_flashlight",
+        "got": "open_flashlight",
+        "ok": false,
+        "seconds": 0.91
+      }
+    ]
+  }
+}

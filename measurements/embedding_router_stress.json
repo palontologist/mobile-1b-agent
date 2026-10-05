@@ -1,0 +1,305 @@
+{
+  "router": "all-MiniLM-L6-v2 via LiteRT",
+  "buckets": {
+    "ambiguous": {
+      "n": 2,
+      "scoreable": 0,
+      "accuracy": null,
+      "median_margin": null,
+      "min_margin": null
+    },
+    "confusable": {
+      "n": 8,
+      "scoreable": 8,
+      "accuracy": 1.0,
+      "median_margin": 0.0437,
+      "min_margin": 0.0237
+    },
+    "misspelled": {
+      "n": 5,
+      "scoreable": 5,
+      "accuracy": 0.8,
+      "median_margin": 0.0438,
+      "min_margin": 0.0023
+    },
+    "multi_intent": {
+      "n": 3,
+      "scoreable": 0,
+      "accuracy": null,
+      "median_margin": null,
+      "min_margin": null
+    },
+    "noisy": {
+      "n": 5,
+      "scoreable": 5,
+      "accuracy": 1.0,
+      "median_margin": 0.0262,
+      "min_margin": 0.0148
+    },
+    "out_of_scope": {
+      "n": 5,
+      "scoreable": 0,
+      "accuracy": null,
+      "median_margin": null,
+      "min_margin": null
+    }
+  },
+  "separability": {
+    "min_margin_when_correct": 0.0039,
+    "max_margin_when_wrong": 0.0023
+  },
+  "detail": [
+    {
+      "prompt": "turn on the flashlight",
+      "bucket": "confusable",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0619,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "switch the flashlight on",
+      "bucket": "confusable",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0237,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "turn off the flashlight",
+      "bucket": "confusable",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.0366,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "switch the flashlight off",
+      "bucket": "confusable",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.0419,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "kill the torch",
+      "bucket": "confusable",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.0434,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "light on",
+      "bucket": "confusable",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0439,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "light off",
+      "bucket": "confusable",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.0954,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "flashlight on please",
+      "bucket": "confusable",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.058,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "turn on the flashlight and check my calendar",
+      "bucket": "multi_intent",
+      "expected": null,
+      "got": "query_calendar",
+      "margin": 0.0213,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "take a photo and show my events",
+      "bucket": "multi_intent",
+      "expected": null,
+      "got": "take_photo",
+      "margin": 0.0667,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "snap a pic then turn off the light",
+      "bucket": "multi_intent",
+      "expected": null,
+      "got": "close_flashlight",
+      "margin": 0.0119,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "can u turn the torch on",
+      "bucket": "noisy",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0494,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "pls flashlight off thx",
+      "bucket": "noisy",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.015,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "TURN THE FLASHLIGHT OFF",
+      "bucket": "noisy",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.039,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "ok so anyway lights on now",
+      "bucket": "noisy",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0262,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "umm turn off the flashlight i guess",
+      "bucket": "noisy",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "margin": 0.0148,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "turn on the flaslight",
+      "bucket": "misspelled",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0438,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "flahslight on",
+      "bucket": "misspelled",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "margin": 0.0039,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "calender today",
+      "bucket": "misspelled",
+      "expected": "query_calendar",
+      "got": "query_calendar",
+      "margin": 0.5527,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "shw my evnets",
+      "bucket": "misspelled",
+      "expected": "query_calendar",
+      "got": "open_flashlight",
+      "margin": 0.0023,
+      "unscoreable": false,
+      "correct": false
+    },
+    {
+      "prompt": "tak a photo",
+      "bucket": "misspelled",
+      "expected": "take_photo",
+      "got": "take_photo",
+      "margin": 0.3133,
+      "unscoreable": false,
+      "correct": true
+    },
+    {
+      "prompt": "what is the weather in nairobi",
+      "bucket": "out_of_scope",
+      "expected": null,
+      "got": "query_calendar",
+      "margin": 0.0359,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "who won the match on sunday",
+      "bucket": "out_of_scope",
+      "expected": null,
+      "got": "query_calendar",
+      "margin": 0.0605,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "play some music",
+      "bucket": "out_of_scope",
+      "expected": null,
+      "got": "close_flashlight",
+      "margin": 0.014,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "set a reminder for my dentist",
+      "bucket": "out_of_scope",
+      "expected": null,
+      "got": "query_calendar",
+      "margin": 0.1393,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "how tall is mount kenya",
+      "bucket": "out_of_scope",
+      "expected": null,
+      "got": "take_photo",
+      "margin": 0.0126,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "is the light on",
+      "bucket": "ambiguous",
+      "expected": null,
+      "got": "open_flashlight",
+      "margin": 0.0686,
+      "unscoreable": true,
+      "correct": null
+    },
+    {
+      "prompt": "should i turn the torch off",
+      "bucket": "ambiguous",
+      "expected": null,
+      "got": "close_flashlight",
+      "margin": 0.0595,
+      "unscoreable": true,
+      "correct": null
+    }
+  ]
+}

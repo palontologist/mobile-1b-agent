@@ -1,0 +1,285 @@
+{
+  "model": "function-gemma-q8-ekv1024.litertlm",
+  "backend": "cpu",
+  "paraphrase": {
+    "by_kind": {
+      "literal": {
+        "n": 3,
+        "accuracy": 1.0
+      },
+      "paraphrase": {
+        "n": 12,
+        "accuracy": 0.1667
+      },
+      "terse": {
+        "n": 1,
+        "accuracy": 0.0
+      }
+    },
+    "probes": [
+      {
+        "prompt": "what is on my calendar today",
+        "expected_tool": "query_calendar",
+        "kind": "literal",
+        "tool_match": true,
+        "refusal": false,
+        "prose": "",
+        "seconds": 0.449
+      },
+      {
+        "prompt": "whats on my calender today",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need to know what you want to do today to show me the calendar. Please choose from: open_flashlight, manage_calendar, view_events, or take_photo.",
+        "seconds": 0.943
+      },
+      {
+        "prompt": "calendar today",
+        "expected_tool": "query_calendar",
+        "kind": "terse",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need the list of events to show you the calendar. Please provide the list of events you would like to see today.",
+        "seconds": 0.735
+      },
+      {
+        "prompt": "what's my schedule",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I am sorry, but I do not have a tool available that can check your schedule.",
+        "seconds": 0.542
+      },
+      {
+        "prompt": "list my calendar events",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need the list of events you want to view on the calendar. Please provide the object.",
+        "seconds": 0.572
+      },
+      {
+        "prompt": "do i have meetings today",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I am sorry, but I do not have a tool available that allows me to view or manage meetings.",
+        "seconds": 0.625
+      },
+      {
+        "prompt": "am i busy today",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I am sorry, but I do not have a tool available that allows me to check your current activity.",
+        "seconds": 0.624
+      },
+      {
+        "prompt": "show my events",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need the list of events to show them. Please provide the list of events you would like to see.",
+        "seconds": 0.653
+      },
+      {
+        "prompt": "turn on the flashlight",
+        "expected_tool": "open_flashlight",
+        "kind": "literal",
+        "tool_match": true,
+        "refusal": false,
+        "prose": "",
+        "seconds": 0.393
+      },
+      {
+        "prompt": "i need some light in here",
+        "expected_tool": "open_flashlight",
+        "kind": "paraphrase",
+        "tool_match": true,
+        "refusal": false,
+        "prose": "",
+        "seconds": 0.4
+      },
+      {
+        "prompt": "it is dark in here",
+        "expected_tool": "open_flashlight",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need the content you want to add to the background of the image. Please provide the image content.",
+        "seconds": 0.708
+      },
+      {
+        "prompt": "lights on please",
+        "expected_tool": "open_flashlight",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need the content you want to see on the screen. Please provide the text or image you want to display.",
+        "seconds": 0.715
+      },
+      {
+        "prompt": "turn off the flashlight",
+        "expected_tool": "close_flashlight",
+        "kind": "literal",
+        "tool_match": true,
+        "refusal": false,
+        "prose": "",
+        "seconds": 0.373
+      },
+      {
+        "prompt": "kill the torch now",
+        "expected_tool": "close_flashlight",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I'm sorry, but I do not have a tool available that can directly kill a device like the torch.",
+        "seconds": 0.66
+      },
+      {
+        "prompt": "shut the light",
+        "expected_tool": "close_flashlight",
+        "kind": "paraphrase",
+        "tool_match": true,
+        "refusal": false,
+        "prose": "",
+        "seconds": 0.397
+      },
+      {
+        "prompt": "no more light",
+        "expected_tool": "close_flashlight",
+        "kind": "paraphrase",
+        "tool_match": false,
+        "refusal": true,
+        "prose": "I need more information to perform the action you requested.",
+        "seconds": 0.453
+      }
+    ]
+  },
+  "description_wording": {
+    "n_prompts": 16,
+    "n_flipped": 3,
+    "rows": [
+      {
+        "prompt": "what is on my calendar today",
+        "expected_tool": "query_calendar",
+        "kind": "literal",
+        "match_worded": true,
+        "match_reworded": true
+      },
+      {
+        "prompt": "whats on my calender today",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "calendar today",
+        "expected_tool": "query_calendar",
+        "kind": "terse",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "what's my schedule",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": true
+      },
+      {
+        "prompt": "list my calendar events",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "do i have meetings today",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "am i busy today",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "show my events",
+        "expected_tool": "query_calendar",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "turn on the flashlight",
+        "expected_tool": "open_flashlight",
+        "kind": "literal",
+        "match_worded": true,
+        "match_reworded": true
+      },
+      {
+        "prompt": "i need some light in here",
+        "expected_tool": "open_flashlight",
+        "kind": "paraphrase",
+        "match_worded": true,
+        "match_reworded": false
+      },
+      {
+        "prompt": "it is dark in here",
+        "expected_tool": "open_flashlight",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "lights on please",
+        "expected_tool": "open_flashlight",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "turn off the flashlight",
+        "expected_tool": "close_flashlight",
+        "kind": "literal",
+        "match_worded": true,
+        "match_reworded": true
+      },
+      {
+        "prompt": "kill the torch now",
+        "expected_tool": "close_flashlight",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      },
+      {
+        "prompt": "shut the light",
+        "expected_tool": "close_flashlight",
+        "kind": "paraphrase",
+        "match_worded": true,
+        "match_reworded": false
+      },
+      {
+        "prompt": "no more light",
+        "expected_tool": "close_flashlight",
+        "kind": "paraphrase",
+        "match_worded": false,
+        "match_reworded": false
+      }
+    ]
+  },
+  "median_seconds": 0.598
+}

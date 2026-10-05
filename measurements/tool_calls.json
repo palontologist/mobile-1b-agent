@@ -1,0 +1,219 @@
+{
+  "model": "function-gemma-q8-ekv1024.litertlm",
+  "backend": "cpu",
+  "runtime": "litert-lm (see pip freeze)",
+  "prompt_count": 16,
+  "tool_name_accuracy": 0.1875,
+  "exact_accuracy": 0.1875,
+  "latency_seconds": {
+    "median": 0.839,
+    "mean": 0.811,
+    "max": 1.086
+  },
+  "rows": [
+    {
+      "prompt": "turn on the flashlight",
+      "expected_tool": "open_flashlight",
+      "expected_args": {},
+      "got_tool": "open_flashlight",
+      "got_args": {},
+      "tool_match": true,
+      "args_match": true,
+      "prose": "",
+      "seconds": 0.554,
+      "kv_tokens": 431
+    },
+    {
+      "prompt": "switch the flashlight on please",
+      "expected_tool": "open_flashlight",
+      "expected_args": {},
+      "got_tool": "open_flashlight",
+      "got_args": {},
+      "tool_match": true,
+      "args_match": true,
+      "prose": "",
+      "seconds": 0.538,
+      "kv_tokens": 432
+    },
+    {
+      "prompt": "turn off the flashlight",
+      "expected_tool": "close_flashlight",
+      "expected_args": {},
+      "got_tool": "close_flashlight",
+      "got_args": {},
+      "tool_match": true,
+      "args_match": true,
+      "prose": "",
+      "seconds": 0.576,
+      "kv_tokens": 431
+    },
+    {
+      "prompt": "kill the torch",
+      "expected_tool": "close_flashlight",
+      "expected_args": {},
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "I'm sorry, but I do not have a tool available that can directly kill a device like the torch.",
+      "seconds": 0.9,
+      "kv_tokens": 445
+    },
+    {
+      "prompt": "take a photo",
+      "expected_tool": "take_photo",
+      "expected_args": {},
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "I need the object to take a photo. Please provide the picture.",
+      "seconds": 0.777,
+      "kv_tokens": 436
+    },
+    {
+      "prompt": "snap a picture",
+      "expected_tool": "take_photo",
+      "expected_args": {},
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "I am sorry, but I do not have a tool available that can snap a picture.",
+      "seconds": 0.823,
+      "kv_tokens": 440
+    },
+    {
+      "prompt": "set an alarm for 07:30",
+      "expected_tool": "set_alarm",
+      "expected_args": {
+        "hhmm": "07:30"
+      },
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": false,
+      "prose": "I need the time for the alarm to set. Please provide the 24-hour alarm time.",
+      "seconds": 0.888,
+      "kv_tokens": 450
+    },
+    {
+      "prompt": "wake me up at 6am",
+      "expected_tool": "set_alarm",
+      "expected_args": {
+        "hhmm": "06:00"
+      },
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": false,
+      "prose": "I am sorry, but I do not have a tool available that can wake you up at 6am.",
+      "seconds": 0.86,
+      "kv_tokens": 448
+    },
+    {
+      "prompt": "what is on my calendar today",
+      "expected_tool": "query_calendar",
+      "expected_args": {},
+      "got_tool": "take_photo",
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "",
+      "seconds": 0.572,
+      "kv_tokens": 433
+    },
+    {
+      "prompt": "do i have meetings today",
+      "expected_tool": "query_calendar",
+      "expected_args": {},
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "I am sorry, but I do not have a tool available that allows me to make meetings.",
+      "seconds": 0.855,
+      "kv_tokens": 443
+    },
+    {
+      "prompt": "send a message to mom saying hi",
+      "expected_tool": "send_message",
+      "expected_args": {
+        "recipient": "mom"
+      },
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": false,
+      "prose": "I need the recipient's phone number or name to send the message. Please provide the phone number or name to send a message to your mom.",
+      "seconds": 1.086,
+      "kv_tokens": 456
+    },
+    {
+      "prompt": "text alex that i am running late",
+      "expected_tool": "send_message",
+      "expected_args": {
+        "recipient": "alex"
+      },
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": false,
+      "prose": "I am sorry, but I do not have a tool available that can perform a text message (SMS).",
+      "seconds": 0.874,
+      "kv_tokens": 447
+    },
+    {
+      "prompt": "write a note titled groceries",
+      "expected_tool": "append_note",
+      "expected_args": {
+        "title": "groceries"
+      },
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": false,
+      "prose": "I need the recipient's phone number or contact name to send the message. Please provide the recipient's phone number or contact name.",
+      "seconds": 1.085,
+      "kv_tokens": 452
+    },
+    {
+      "prompt": "remind me to buy milk",
+      "expected_tool": "append_note",
+      "expected_args": {
+        "title": "milk"
+      },
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": false,
+      "prose": "I'm sorry, but I do not have a tool available that can send an SMS message to your phone to remind you to buy milk.",
+      "seconds": 1.04,
+      "kv_tokens": 454
+    },
+    {
+      "prompt": "what is the weather in nairobi",
+      "expected_tool": "noop",
+      "expected_args": {},
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "I am sorry, but I do not have a tool available that can provide weather information.",
+      "seconds": 0.73,
+      "kv_tokens": 444
+    },
+    {
+      "prompt": "thanks, that was helpful",
+      "expected_tool": "noop",
+      "expected_args": {},
+      "got_tool": null,
+      "got_args": {},
+      "tool_match": false,
+      "args_match": true,
+      "prose": "I am sorry, but I do not have a tool available that can help me with that request.",
+      "seconds": 0.821,
+      "kv_tokens": 444
+    }
+  ]
+}

@@ -1,0 +1,587 @@
+{
+  "tag": "v2",
+  "abstain_margin": 0.02,
+  "n": 45,
+  "overall": 0.6667,
+  "safety": {
+    "false_act": 8,
+    "abstain_overfire": 6,
+    "wrong_tool": 1
+  },
+  "buckets": {
+    "ambiguous": {
+      "n": 3,
+      "correct": 2,
+      "accuracy": 0.6667,
+      "median_margin": 0.0184
+    },
+    "antonym": {
+      "n": 6,
+      "correct": 5,
+      "accuracy": 0.8333,
+      "median_margin": 0.0969
+    },
+    "fragment": {
+      "n": 4,
+      "correct": 4,
+      "accuracy": 1.0,
+      "median_margin": 0.1695
+    },
+    "indirect": {
+      "n": 7,
+      "correct": 3,
+      "accuracy": 0.4286,
+      "median_margin": 0.0611
+    },
+    "multi": {
+      "n": 2,
+      "correct": 2,
+      "accuracy": 1.0,
+      "median_margin": null
+    },
+    "negation": {
+      "n": 5,
+      "correct": 1,
+      "accuracy": 0.2,
+      "median_margin": 0.07
+    },
+    "out_of_scope": {
+      "n": 5,
+      "correct": 2,
+      "accuracy": 0.4,
+      "median_margin": 0.0233
+    },
+    "plain": {
+      "n": 4,
+      "correct": 3,
+      "accuracy": 0.75,
+      "median_margin": 0.1941
+    },
+    "polite": {
+      "n": 5,
+      "correct": 5,
+      "accuracy": 1.0,
+      "median_margin": 0.0682
+    },
+    "typo": {
+      "n": 4,
+      "correct": 3,
+      "accuracy": 0.75,
+      "median_margin": 0.1563
+    }
+  },
+  "failures": [
+    {
+      "utterance": "my hands are full and I can't see what I'm doing",
+      "expected": "open_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": null
+    },
+    {
+      "utterance": "the room is too dark to read anything",
+      "expected": "open_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": 0.0016
+    },
+    {
+      "utterance": "I don't need it any more, and it's blinding me",
+      "expected": "close_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": null
+    },
+    {
+      "utterance": "that beam is giving me a headache",
+      "expected": "close_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": 0.0145
+    },
+    {
+      "utterance": "do not switch the torch on",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "negation",
+      "margin": 0.0421
+    },
+    {
+      "utterance": "never turn the flashlight off",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "negation",
+      "margin": 0.07
+    },
+    {
+      "utterance": "I don't want to take a photo",
+      "expected": "clarify",
+      "got": "take_photo",
+      "bucket": "negation",
+      "margin": 0.3032
+    },
+    {
+      "utterance": "don't show me my calendar",
+      "expected": "clarify",
+      "got": "query_calendar",
+      "bucket": "negation",
+      "margin": 0.3145
+    },
+    {
+      "utterance": "switch the torch on",
+      "expected": "open_flashlight",
+      "got": "clarify",
+      "bucket": "antonym",
+      "margin": 0.0154
+    },
+    {
+      "utterance": "tirn of the flaslight",
+      "expected": "close_flashlight",
+      "got": "open_flashlight",
+      "bucket": "typo",
+      "margin": 0.1936
+    },
+    {
+      "utterance": "how much data have I used this month",
+      "expected": "clarify",
+      "got": "query_calendar",
+      "bucket": "out_of_scope",
+      "margin": 0.1667
+    },
+    {
+      "utterance": "call my brother",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "out_of_scope",
+      "margin": 0.0233
+    },
+    {
+      "utterance": "how do I tie a knot",
+      "expected": "clarify",
+      "got": "take_photo",
+      "bucket": "out_of_scope",
+      "margin": 0.0969
+    },
+    {
+      "utterance": "would turning it off be sensible in here",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "ambiguous",
+      "margin": 0.1445
+    },
+    {
+      "utterance": "put the lamp out",
+      "expected": "close_flashlight",
+      "got": "clarify",
+      "bucket": "plain",
+      "margin": 0.0143
+    }
+  ],
+  "detail": [
+    {
+      "utterance": "my hands are full and I can't see what I'm doing",
+      "expected": "open_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": null,
+      "reason": "multi_intent",
+      "correct": false
+    },
+    {
+      "utterance": "it's pitch black in here",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "indirect",
+      "margin": 0.2861,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "the room is too dark to read anything",
+      "expected": "open_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": 0.0016,
+      "reason": "negative_competes(neg=0.243 next=0.531 top=0.533)",
+      "correct": false
+    },
+    {
+      "utterance": "I keep knocking into things in here",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "indirect",
+      "margin": 0.1093,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "I don't need it any more, and it's blinding me",
+      "expected": "close_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": null,
+      "reason": "multi_intent",
+      "correct": false
+    },
+    {
+      "utterance": "that beam is giving me a headache",
+      "expected": "close_flashlight",
+      "got": "clarify",
+      "bucket": "indirect",
+      "margin": 0.0145,
+      "reason": "negative_competes(neg=0.189 next=0.397 top=0.411)",
+      "correct": false
+    },
+    {
+      "utterance": "the battery is suffering because of that lamp",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "bucket": "indirect",
+      "margin": 0.0611,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "could you possibly turn the torch on for me",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "polite",
+      "margin": 0.0477,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "would you mind switching the flashlight off",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "bucket": "polite",
+      "margin": 0.0308,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "when you get a second, could you snap a quick photo",
+      "expected": "take_photo",
+      "got": "take_photo",
+      "bucket": "polite",
+      "margin": 0.4596,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "I was wondering if you could tell me what I've got lined up today",
+      "expected": "query_calendar",
+      "got": "query_calendar",
+      "bucket": "polite",
+      "margin": 0.1396,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "hey, quick one before I forget - what's on today",
+      "expected": "query_calendar",
+      "got": "query_calendar",
+      "bucket": "polite",
+      "margin": 0.0682,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "torch",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "fragment",
+      "margin": 0.0389,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "flashlight off",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "bucket": "fragment",
+      "margin": 0.0966,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "today's agenda",
+      "expected": "query_calendar",
+      "got": "query_calendar",
+      "bucket": "fragment",
+      "margin": 0.3964,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "pic",
+      "expected": "take_photo",
+      "got": "take_photo",
+      "bucket": "fragment",
+      "margin": 0.2424,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "don't turn on the light",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "negation",
+      "margin": 0.0123,
+      "reason": "negative_competes(neg=0.266 next=0.839 top=0.852)",
+      "correct": true
+    },
+    {
+      "utterance": "do not switch the torch on",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "negation",
+      "margin": 0.0421,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "never turn the flashlight off",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "negation",
+      "margin": 0.07,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "I don't want to take a photo",
+      "expected": "clarify",
+      "got": "take_photo",
+      "bucket": "negation",
+      "margin": 0.3032,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "don't show me my calendar",
+      "expected": "clarify",
+      "got": "query_calendar",
+      "bucket": "negation",
+      "margin": 0.3145,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "switch the torch on",
+      "expected": "open_flashlight",
+      "got": "clarify",
+      "bucket": "antonym",
+      "margin": 0.0154,
+      "reason": "negative_competes(neg=0.249 next=0.768 top=0.783)",
+      "correct": false
+    },
+    {
+      "utterance": "switch the torch off",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "bucket": "antonym",
+      "margin": 0.1279,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "power the torch on",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "antonym",
+      "margin": 0.0346,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "power the torch off",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "bucket": "antonym",
+      "margin": 0.1463,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "the torch is on now",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "antonym",
+      "margin": 0.0974,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "the torch is off now",
+      "expected": "close_flashlight",
+      "got": "close_flashlight",
+      "bucket": "antonym",
+      "margin": 0.0964,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "turn onn the flashlught",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "typo",
+      "margin": 0.0476,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "tirn of the flaslight",
+      "expected": "close_flashlight",
+      "got": "open_flashlight",
+      "bucket": "typo",
+      "margin": 0.1936,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "whats on my calndar",
+      "expected": "query_calendar",
+      "got": "query_calendar",
+      "bucket": "typo",
+      "margin": 0.119,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "tka a snap",
+      "expected": "take_photo",
+      "got": "take_photo",
+      "bucket": "typo",
+      "margin": 0.2675,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "switch the torch on then tell me what's on today",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "multi",
+      "margin": null,
+      "reason": "multi_intent",
+      "correct": true
+    },
+    {
+      "utterance": "snap something and then turn the torch off",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "multi",
+      "margin": null,
+      "reason": "multi_intent",
+      "correct": true
+    },
+    {
+      "utterance": "how much data have I used this month",
+      "expected": "clarify",
+      "got": "query_calendar",
+      "bucket": "out_of_scope",
+      "margin": 0.1667,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "call my brother",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "out_of_scope",
+      "margin": 0.0233,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "what's the exchange rate",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "out_of_scope",
+      "margin": 0.0114,
+      "reason": "negative_competes(neg=0.140 next=0.100 top=0.151)",
+      "correct": true
+    },
+    {
+      "utterance": "read my last message aloud",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "out_of_scope",
+      "margin": 0.0126,
+      "reason": "negative_competes(neg=0.290 next=0.240 top=0.302)",
+      "correct": true
+    },
+    {
+      "utterance": "how do I tie a knot",
+      "expected": "clarify",
+      "got": "take_photo",
+      "bucket": "out_of_scope",
+      "margin": 0.0969,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "is the torch still on",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "ambiguous",
+      "margin": 0.0184,
+      "reason": "negative_competes(neg=0.173 next=0.672 top=0.691)",
+      "correct": true
+    },
+    {
+      "utterance": "would turning it off be sensible in here",
+      "expected": "clarify",
+      "got": "close_flashlight",
+      "bucket": "ambiguous",
+      "margin": 0.1445,
+      "reason": null,
+      "correct": false
+    },
+    {
+      "utterance": "same as last time",
+      "expected": "clarify",
+      "got": "clarify",
+      "bucket": "ambiguous",
+      "margin": -0.0801,
+      "reason": "negative_competes(neg=0.341 next=0.239 top=0.261)",
+      "correct": true
+    },
+    {
+      "utterance": "give us some light in here",
+      "expected": "open_flashlight",
+      "got": "open_flashlight",
+      "bucket": "plain",
+      "margin": 0.2714,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "put the lamp out",
+      "expected": "close_flashlight",
+      "got": "clarify",
+      "bucket": "plain",
+      "margin": 0.0143,
+      "reason": "negative_competes(neg=0.240 next=0.561 top=0.575)",
+      "correct": false
+    },
+    {
+      "utterance": "anything on for me today",
+      "expected": "query_calendar",
+      "got": "query_calendar",
+      "bucket": "plain",
+      "margin": 0.2091,
+      "reason": null,
+      "correct": true
+    },
+    {
+      "utterance": "capture what I'm looking at",
+      "expected": "take_photo",
+      "got": "take_photo",
+      "bucket": "plain",
+      "margin": 0.1791,
+      "reason": null,
+      "correct": true
+    }
+  ]
+}

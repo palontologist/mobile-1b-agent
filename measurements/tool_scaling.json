@@ -1,0 +1,910 @@
+{
+  "model": "function-gemma-q8-ekv1024.litertlm",
+  "backend": "cpu",
+  "cases": 17,
+  "summary": [
+    {
+      "tool_set": "1_tool",
+      "n_tools": 1,
+      "prompts_scored": 2,
+      "tool_name_accuracy": 0.5,
+      "exact_accuracy": 0.5,
+      "refusal_rate": 0.9412,
+      "median_seconds": 0.522
+    },
+    {
+      "tool_set": "2_tools",
+      "n_tools": 2,
+      "prompts_scored": 5,
+      "tool_name_accuracy": 0.4,
+      "exact_accuracy": 0.4,
+      "refusal_rate": 0.7647,
+      "median_seconds": 0.564
+    },
+    {
+      "tool_set": "4_tools",
+      "n_tools": 4,
+      "prompts_scored": 9,
+      "tool_name_accuracy": 0.5556,
+      "exact_accuracy": 0.5556,
+      "refusal_rate": 0.7059,
+      "median_seconds": 0.637
+    },
+    {
+      "tool_set": "8_tools",
+      "n_tools": 8,
+      "prompts_scored": 17,
+      "tool_name_accuracy": 0.1765,
+      "exact_accuracy": 0.1765,
+      "refusal_rate": 0.8235,
+      "median_seconds": 0.875
+    }
+  ],
+  "detail": [
+    {
+      "tool_set": "1_tool",
+      "tools": [
+        "query_calendar"
+      ],
+      "prompts_scored": 2,
+      "prompts_total": 17,
+      "tool_name_accuracy": 0.5,
+      "exact_accuracy": 0.5,
+      "refusal_rate": 0.9412,
+      "median_seconds": 0.522,
+      "rows": [
+        {
+          "prompt": "turn on the flashlight",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that allows me to turn on the flashlight.",
+          "seconds": 0.576
+        },
+        {
+          "prompt": "switch the flashlight on please",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can switch the flashlight on or off.",
+          "seconds": 0.555
+        },
+        {
+          "prompt": "i need some light in here",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can help me with requests that require a text input.",
+          "seconds": 0.612
+        },
+        {
+          "prompt": "turn off the flashlight",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can turn off the flashlight.",
+          "seconds": 0.501
+        },
+        {
+          "prompt": "kill the torch now",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that allows me to directly manage the actions of the camera or other device connected to the user's device.",
+          "seconds": 0.863
+        },
+        {
+          "prompt": "what is on my calendar today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": "query_calendar",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.248
+        },
+        {
+          "prompt": "do i have any meetings today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that allows me to view a meeting's schedule.",
+          "seconds": 0.569
+        },
+        {
+          "prompt": "take a photo",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available to take a photo.",
+          "seconds": 0.463
+        },
+        {
+          "prompt": "snap a picture of the room",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can help me snap a picture.",
+          "seconds": 0.505
+        },
+        {
+          "prompt": "set an alarm for 07:30",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "07:30"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can set an alarm.",
+          "seconds": 0.485
+        },
+        {
+          "prompt": "wake me up at 06:00",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "06:00"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can wake you up.",
+          "seconds": 0.49
+        },
+        {
+          "prompt": "send a message to mom saying hi",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "mom"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send a message to mom.",
+          "seconds": 0.522
+        },
+        {
+          "prompt": "text alex that i am running late",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "alex"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send text messages (SMS).",
+          "seconds": 0.521
+        },
+        {
+          "prompt": "write a note titled groceries",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "groceries"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can write a note titled \"Groceries.\"",
+          "seconds": 0.557
+        },
+        {
+          "prompt": "remind me to buy milk",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "milk"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send an email reminder.",
+          "seconds": 0.497
+        },
+        {
+          "prompt": "what is the weather in nairobi",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am FunctionGemma, a model optimized for function calls. I can only assist with requests that require a function call.",
+          "seconds": 0.584
+        },
+        {
+          "prompt": "thanks, that was helpful",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am FunctionGemma, a model optimized for function calls. I can only assist with requests that require a function call.",
+          "seconds": 0.636
+        }
+      ]
+    },
+    {
+      "tool_set": "2_tools",
+      "tools": [
+        "open_flashlight",
+        "query_calendar"
+      ],
+      "prompts_scored": 5,
+      "prompts_total": 17,
+      "tool_name_accuracy": 0.4,
+      "exact_accuracy": 0.4,
+      "refusal_rate": 0.7647,
+      "median_seconds": 0.564,
+      "rows": [
+        {
+          "prompt": "turn on the flashlight",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.301
+        },
+        {
+          "prompt": "switch the flashlight on please",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.282
+        },
+        {
+          "prompt": "i need some light in here",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the content of the query to perform the action you requested. Please provide the text or content you want to add.",
+          "seconds": 0.734
+        },
+        {
+          "prompt": "turn off the flashlight",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "",
+          "seconds": 0.324
+        },
+        {
+          "prompt": "kill the torch now",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can directly kill a device like the torch.",
+          "seconds": 0.622
+        },
+        {
+          "prompt": "what is on my calendar today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "",
+          "seconds": 0.314
+        },
+        {
+          "prompt": "do i have any meetings today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that allows me to view a meeting's schedule.",
+          "seconds": 0.623
+        },
+        {
+          "prompt": "take a photo",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that allows me to take a photo.",
+          "seconds": 0.566
+        },
+        {
+          "prompt": "snap a picture of the room",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can take a picture.",
+          "seconds": 0.529
+        },
+        {
+          "prompt": "set an alarm for 07:30",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "07:30"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can set an alarm.",
+          "seconds": 0.549
+        },
+        {
+          "prompt": "wake me up at 06:00",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "06:00"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that allows me to wake you up.",
+          "seconds": 0.604
+        },
+        {
+          "prompt": "send a message to mom saying hi",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "mom"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send a message to mom.",
+          "seconds": 0.564
+        },
+        {
+          "prompt": "text alex that i am running late",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "alex"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send text messages (SMS).",
+          "seconds": 0.583
+        },
+        {
+          "prompt": "write a note titled groceries",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "groceries"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can write a note titled \"Groceries.\"",
+          "seconds": 0.566
+        },
+        {
+          "prompt": "remind me to buy milk",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "milk"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can send a reminder.",
+          "seconds": 0.533
+        },
+        {
+          "prompt": "what is the weather in nairobi",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can provide real-time weather information.",
+          "seconds": 0.599
+        },
+        {
+          "prompt": "thanks, that was helpful",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can help me with that request.",
+          "seconds": 0.515
+        }
+      ]
+    },
+    {
+      "tool_set": "4_tools",
+      "tools": [
+        "open_flashlight",
+        "close_flashlight",
+        "query_calendar",
+        "take_photo"
+      ],
+      "prompts_scored": 9,
+      "prompts_total": 17,
+      "tool_name_accuracy": 0.5556,
+      "exact_accuracy": 0.5556,
+      "refusal_rate": 0.7059,
+      "median_seconds": 0.637,
+      "rows": [
+        {
+          "prompt": "turn on the flashlight",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.382
+        },
+        {
+          "prompt": "switch the flashlight on please",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.441
+        },
+        {
+          "prompt": "i need some light in here",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.401
+        },
+        {
+          "prompt": "turn off the flashlight",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": "close_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.411
+        },
+        {
+          "prompt": "kill the torch now",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can directly kill a device like the torch.",
+          "seconds": 0.729
+        },
+        {
+          "prompt": "what is on my calendar today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": "query_calendar",
+          "got_args": {
+            "required": []
+          },
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.486
+        },
+        {
+          "prompt": "do i have any meetings today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need to know which time you are interested in.",
+          "seconds": 0.478
+        },
+        {
+          "prompt": "take a photo",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the object to take a photo. Please provide the photo you want to take.",
+          "seconds": 0.662
+        },
+        {
+          "prompt": "snap a picture of the room",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can snap a picture onto a wall.",
+          "seconds": 0.714
+        },
+        {
+          "prompt": "set an alarm for 07:30",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "07:30"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can set an alarm.",
+          "seconds": 0.627
+        },
+        {
+          "prompt": "wake me up at 06:00",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "06:00"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can wake you up.",
+          "seconds": 0.637
+        },
+        {
+          "prompt": "send a message to mom saying hi",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "mom"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send a message to mom.",
+          "seconds": 0.704
+        },
+        {
+          "prompt": "text alex that i am running late",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "alex"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can send text messages (SMS).",
+          "seconds": 0.659
+        },
+        {
+          "prompt": "write a note titled groceries",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "groceries"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can write a note titled \"Groceries.\"",
+          "seconds": 0.716
+        },
+        {
+          "prompt": "remind me to buy milk",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "milk"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can send an email reminder.",
+          "seconds": 0.675
+        },
+        {
+          "prompt": "what is the weather in nairobi",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can provide real-time weather information.",
+          "seconds": 0.664
+        },
+        {
+          "prompt": "thanks, that was helpful",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can help me with that request.",
+          "seconds": 0.634
+        }
+      ]
+    },
+    {
+      "tool_set": "8_tools",
+      "tools": [
+        "open_flashlight",
+        "close_flashlight",
+        "query_calendar",
+        "take_photo",
+        "set_alarm",
+        "send_message",
+        "append_note",
+        "noop"
+      ],
+      "prompts_scored": 17,
+      "prompts_total": 17,
+      "tool_name_accuracy": 0.1765,
+      "exact_accuracy": 0.1765,
+      "refusal_rate": 0.8235,
+      "median_seconds": 0.875,
+      "rows": [
+        {
+          "prompt": "turn on the flashlight",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.579
+        },
+        {
+          "prompt": "switch the flashlight on please",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": "open_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.665
+        },
+        {
+          "prompt": "i need some light in here",
+          "expected_tool": "open_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the content of the note you want to add to the file. Please provide the title of the note.",
+          "seconds": 0.947
+        },
+        {
+          "prompt": "turn off the flashlight",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": "close_flashlight",
+          "got_args": {},
+          "tool_match": true,
+          "args_match": true,
+          "prose": "",
+          "seconds": 0.571
+        },
+        {
+          "prompt": "kill the torch now",
+          "expected_tool": "close_flashlight",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can directly manage the device's power settings like the 'kill' command.",
+          "seconds": 1.16
+        },
+        {
+          "prompt": "what is on my calendar today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the time to look up events. Please provide the 24-hour alarm time.",
+          "seconds": 0.92
+        },
+        {
+          "prompt": "do i have any meetings today",
+          "expected_tool": "query_calendar",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the time you are scheduled for to schedule the meeting. Please provide the 24-hour alarm time.",
+          "seconds": 0.955
+        },
+        {
+          "prompt": "take a photo",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the object to take a photo. Please provide the picture.",
+          "seconds": 0.739
+        },
+        {
+          "prompt": "snap a picture of the room",
+          "expected_tool": "take_photo",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can capture a picture.",
+          "seconds": 0.787
+        },
+        {
+          "prompt": "set an alarm for 07:30",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "07:30"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the time to set the alarm. Please provide the 24-hour alarm time.",
+          "seconds": 0.855
+        },
+        {
+          "prompt": "wake me up at 06:00",
+          "expected_tool": "set_alarm",
+          "expected_args": {
+            "time": "06:00"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can wake you up at 06:00.",
+          "seconds": 0.934
+        },
+        {
+          "prompt": "send a message to mom saying hi",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "mom"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the contact name to send the message. Please provide the name of the contact you want to send the message to.",
+          "seconds": 0.931
+        },
+        {
+          "prompt": "text alex that i am running late",
+          "expected_tool": "send_message",
+          "expected_args": {
+            "contact_name": "alex"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can perform a text message (SMS).",
+          "seconds": 0.875
+        },
+        {
+          "prompt": "write a note titled groceries",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "groceries"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I need the contact name to send the note. Please provide the name of the contact.",
+          "seconds": 0.809
+        },
+        {
+          "prompt": "remind me to buy milk",
+          "expected_tool": "append_note",
+          "expected_args": {
+            "title": "milk"
+          },
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can send a text message (SMS). I can only send an email, create a calendar event, manage the flashlight, open the flashlight on the phone, take a photo, or set an alarm.",
+          "seconds": 1.571
+        },
+        {
+          "prompt": "what is the weather in nairobi",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I'm sorry, but I do not have a tool available that can provide real-time weather information.",
+          "seconds": 0.92
+        },
+        {
+          "prompt": "thanks, that was helpful",
+          "expected_tool": "noop",
+          "expected_args": {},
+          "got_tool": null,
+          "got_args": {},
+          "tool_match": false,
+          "args_match": false,
+          "prose": "I am sorry, but I do not have a tool available that can help me with that request.",
+          "seconds": 0.812
+        }
+      ]
+    }
+  ]
+}

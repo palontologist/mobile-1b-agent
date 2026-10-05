@@ -1,0 +1,424 @@
+{
+  "router": "v2 prototype-expansion + negatives + multi-intent",
+  "abstain_margin": 0.02,
+  "multi_intent_detection": true,
+  "caveat": "Prototype and negative text was written after reading the v1 stress failures, so these scores are training-set, not held-out.",
+  "original18": {
+    "n": 18,
+    "scoreable": 18,
+    "scoreable_accuracy": 1.0,
+    "abstain_total": 0,
+    "abstain_caught": 0,
+    "false_act": 0,
+    "median_margin": 0.571,
+    "rows": [
+      {
+        "prompt": "what is on my calendar today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.6101,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "whats on my calender today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.5763,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "calendar today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.6346,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "what's my schedule",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.7162,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "list my calendar events",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.7153,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "do i have meetings today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.6596,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "am i busy today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.6273,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "show my events",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.7278,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "turn on the flashlight",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.033,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "i need some light in here",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.398,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "it is dark in here",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.5656,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "lights on please",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.3457,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "turn off the flashlight",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.0465,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "kill the torch now",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.2469,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "shut the light",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.2909,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "no more light",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.3968,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "take a photo",
+        "expected": "take_photo",
+        "got": "take_photo",
+        "reason": null,
+        "margin": 0.5898,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "snap a picture of the room",
+        "expected": "take_photo",
+        "got": "take_photo",
+        "reason": null,
+        "margin": 0.5407,
+        "kind": "scoreable",
+        "correct": true
+      }
+    ]
+  },
+  "stress": {
+    "n": 26,
+    "scoreable": 18,
+    "scoreable_accuracy": 0.9444,
+    "abstain_total": 8,
+    "abstain_caught": 8,
+    "false_act": 0,
+    "median_margin": 0.0504,
+    "rows": [
+      {
+        "prompt": "turn on the flashlight",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.033,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "switch the flashlight on",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.0376,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "turn off the flashlight",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.0465,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "switch the flashlight off",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.0376,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "kill the torch",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.2663,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "light on",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.194,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "light off",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.194,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "flashlight on please",
+        "expected": "open_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.1724,
+        "kind": "scoreable",
+        "correct": false
+      },
+      {
+        "prompt": "can u turn the torch on",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.0279,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "pls flashlight off thx",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.1117,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "TURN THE FLASHLIGHT OFF",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.0504,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "ok so anyway lights on now",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.1795,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "umm turn off the flashlight i guess",
+        "expected": "close_flashlight",
+        "got": "close_flashlight",
+        "reason": null,
+        "margin": 0.0259,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "turn on the flaslight",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.3686,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "flahslight on",
+        "expected": "open_flashlight",
+        "got": "open_flashlight",
+        "reason": null,
+        "margin": 0.6424,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "calender today",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.6745,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "shw my evnets",
+        "expected": "query_calendar",
+        "got": "query_calendar",
+        "reason": null,
+        "margin": 0.7262,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "tak a photo",
+        "expected": "take_photo",
+        "got": "take_photo",
+        "reason": null,
+        "margin": 0.6864,
+        "kind": "scoreable",
+        "correct": true
+      },
+      {
+        "prompt": "turn on the flashlight and check my calendar",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "multi_intent",
+        "margin": null,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "take a photo and show my events",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "multi_intent",
+        "margin": null,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "snap a pic then turn off the light",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "multi_intent",
+        "margin": null,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "what is the weather in nairobi",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "negative_competes(neg=1.000 next=0.134 top=0.162)",
+        "margin": -0.8383,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "who won the match on sunday",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "negative_competes(neg=1.000 next=0.182 top=0.184)",
+        "margin": -0.8162,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "play some music",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "negative_competes(neg=1.000 next=0.258 top=0.310)",
+        "margin": -0.6895,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "set a reminder for my dentist",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "negative_competes(neg=1.000 next=0.192 top=0.365)",
+        "margin": -0.6346,
+        "kind": "abstain",
+        "correct": true
+      },
+      {
+        "prompt": "how tall is mount kenya",
+        "expected": "clarify",
+        "got": "clarify",
+        "reason": "negative_competes(neg=1.000 next=0.075 top=0.085)",
+        "margin": -0.9154,
+        "kind": "abstain",
+        "correct": true
+      }
+    ]
+  }
+}

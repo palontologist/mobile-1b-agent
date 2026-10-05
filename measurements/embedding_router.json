@@ -1,0 +1,196 @@
+{
+  "router": "all-MiniLM-L6-v2 via LiteRT (.tflite, 89.9 MB)",
+  "tools": [
+    "open_flashlight",
+    "close_flashlight",
+    "query_calendar",
+    "take_photo"
+  ],
+  "prompts": 18,
+  "accuracy": 1.0,
+  "by_kind": {
+    "paraphrase": {
+      "n": 13,
+      "accuracy": 1.0
+    },
+    "literal": {
+      "n": 4,
+      "accuracy": 1.0
+    },
+    "terse": {
+      "n": 1,
+      "accuracy": 1.0
+    }
+  },
+  "median_ms": 33.3,
+  "max_ms": 34.5,
+  "tool_embed_init_ms": 137.6,
+  "margin": {
+    "mean_when_correct": 0.2395,
+    "mean_when_wrong": null
+  },
+  "detail": [
+    {
+      "prompt": "what is on my calendar today",
+      "expected": "query_calendar",
+      "kind": "literal",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.5454,
+      "ms": 31.1
+    },
+    {
+      "prompt": "whats on my calender today",
+      "expected": "query_calendar",
+      "kind": "paraphrase",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.466,
+      "ms": 30.7
+    },
+    {
+      "prompt": "calendar today",
+      "expected": "query_calendar",
+      "kind": "terse",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.5889,
+      "ms": 32.8
+    },
+    {
+      "prompt": "what's my schedule",
+      "expected": "query_calendar",
+      "kind": "paraphrase",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.2262,
+      "ms": 29.4
+    },
+    {
+      "prompt": "list my calendar events",
+      "expected": "query_calendar",
+      "kind": "paraphrase",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.6071,
+      "ms": 26.1
+    },
+    {
+      "prompt": "do i have meetings today",
+      "expected": "query_calendar",
+      "kind": "paraphrase",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.2889,
+      "ms": 34.3
+    },
+    {
+      "prompt": "am i busy today",
+      "expected": "query_calendar",
+      "kind": "paraphrase",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.1626,
+      "ms": 33.5
+    },
+    {
+      "prompt": "show my events",
+      "expected": "query_calendar",
+      "kind": "paraphrase",
+      "got": "query_calendar",
+      "ok": true,
+      "margin": 0.3488,
+      "ms": 34.4
+    },
+    {
+      "prompt": "turn on the flashlight",
+      "expected": "open_flashlight",
+      "kind": "literal",
+      "got": "open_flashlight",
+      "ok": true,
+      "margin": 0.0619,
+      "ms": 33.3
+    },
+    {
+      "prompt": "i need some light in here",
+      "expected": "open_flashlight",
+      "kind": "paraphrase",
+      "got": "open_flashlight",
+      "ok": true,
+      "margin": 0.0389,
+      "ms": 31.0
+    },
+    {
+      "prompt": "it is dark in here",
+      "expected": "open_flashlight",
+      "kind": "paraphrase",
+      "got": "open_flashlight",
+      "ok": true,
+      "margin": 0.0391,
+      "ms": 33.3
+    },
+    {
+      "prompt": "lights on please",
+      "expected": "open_flashlight",
+      "kind": "paraphrase",
+      "got": "open_flashlight",
+      "ok": true,
+      "margin": 0.0387,
+      "ms": 34.3
+    },
+    {
+      "prompt": "turn off the flashlight",
+      "expected": "close_flashlight",
+      "kind": "literal",
+      "got": "close_flashlight",
+      "ok": true,
+      "margin": 0.0366,
+      "ms": 31.7
+    },
+    {
+      "prompt": "kill the torch now",
+      "expected": "close_flashlight",
+      "kind": "paraphrase",
+      "got": "close_flashlight",
+      "ok": true,
+      "margin": 0.0231,
+      "ms": 34.4
+    },
+    {
+      "prompt": "shut the light",
+      "expected": "close_flashlight",
+      "kind": "paraphrase",
+      "got": "close_flashlight",
+      "ok": true,
+      "margin": 0.1103,
+      "ms": 34.2
+    },
+    {
+      "prompt": "no more light",
+      "expected": "close_flashlight",
+      "kind": "paraphrase",
+      "got": "close_flashlight",
+      "ok": true,
+      "margin": 0.0024,
+      "ms": 32.5
+    },
+    {
+      "prompt": "take a photo",
+      "expected": "take_photo",
+      "kind": "literal",
+      "got": "take_photo",
+      "ok": true,
+      "margin": 0.4664,
+      "ms": 34.5
+    },
+    {
+      "prompt": "snap a picture of the room",
+      "expected": "take_photo",
+      "kind": "paraphrase",
+      "got": "take_photo",
+      "ok": true,
+      "margin": 0.2597,
+      "ms": 33.9
+    }
+  ]
+}

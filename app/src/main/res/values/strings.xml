@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Agent on Phone</string>
+    <string name="btn_enable">enable torch</string>
+    <string name="btn_disable">disable torch</string>
+    <string name="btn_toggle">toggle torch</string>
+    <string name="btn_hammer">hammer 20x on/off (stability)</string>
+    <string name="probe_ready">ready</string>
+    <string name="probe_capabilities">device   : %1$s %2$s\nsdk      : %3$d\nflash    : %4$s\nlitertlm : not wired (inference still simulated upstream)</string>
+    <string name="probe_result">cmd=%1$s  %2$s\nlatency=%3$dus  torch_on=%4$s  commands=%5$d  max_ms=%6$d  avg_ms=%7$d</string>
+    <string name="probe_hammer_done">hammer complete (of 20): failures=%1$d</string>
+</resources>
+

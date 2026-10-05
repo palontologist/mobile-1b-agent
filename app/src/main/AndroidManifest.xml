@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      No <uses-permission> is required to drive the flashlight:
+      CameraManager.setTorchMode() and getCameraCharacteristics() are permission-free
+      on API 23+. CAMERA would only be needed to open a camera session, which this
+      module does not do. The previous README drafted a manifest requesting
+      READ_PHONE_STATE / WRITE_EXTERNAL_STORAGE / a NotificationListenerService; none
+      of those are used by any compiled code here, so they are deliberately absent.
+    -->
+
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
+
+    <!-- Package visibility (API 30+). The open_app tool launches by explicit
+         package name, which is NOT filtered and needs no permission; this is here
+         so an app picker can enumerate launchers later without touching the
+         manifest again. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:icon="@drawable/ic_torch"
+        android:label="@string/app_name">
+
+        <activity
+            android:name=".AgentOnPhoneActivity"
+            android:exported="true"
+            android:launchMode="singleInstance"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".TorchProbeActivity"
+            android:exported="true" />
+
+        <!-- Exported so `adb shell am start` can launch it; it is a measurement probe
+             with no launcher entry, takes no user input, and reads only this app's
+             own files dir. -->
+        <activity
+            android:name=".ToolRoutingProbeActivity"
+            android:exported="true"
+            android:label="Tool routing probe" />
+
+        <activity
+            android:name=".EmbeddingRouterActivity"
+            android:exported="true"
+            android:label="Embedding router probe" />
+    </application>
+</manifest>

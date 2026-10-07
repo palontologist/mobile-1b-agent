@@ -7,7 +7,9 @@ import android.util.Log
 import android.widget.TextView
 import com.google.ai.edge.litertlm.Backend
 import com.google.ai.edge.litertlm.Conversation
+import com.google.ai.edge.litertlm.Contents
 import com.google.ai.edge.litertlm.ConversationConfig
+import com.google.ai.edge.litertlm.ToolManager
 import com.google.ai.edge.litertlm.Engine
 import com.google.ai.edge.litertlm.EngineConfig
 import com.google.ai.edge.litertlm.Message
@@ -74,6 +76,7 @@ class GemmaBenchActivity : Activity() {
     setContentView(log)
 
     val modelPath = intent.getStringExtra("model") ?: DEFAULT_MODEL
+    sysInstruction = intent.getStringExtra("sysinst")
     Thread { run(modelPath) }.start()
   }
 
@@ -135,6 +138,10 @@ class GemmaBenchActivity : Activity() {
     say("GEN_SUMMARY ttft_median_ms=${ttfts.medianOr0()} decode_toks_per_sec=${rates.averageOrNull()}")
 
     // --- tool-call accuracy ------------------------------------------------
+    // --- tool-call accuracy, native ------------------------------------------
+    runNativeToolPhase(engine)
+
+    // --- tool-call accuracy, prompted ----------------------------------------
     val tools = assistantLocalAssistantTools()
     var correct = 0
     var noOutput = 0
@@ -156,7 +163,7 @@ class GemmaBenchActivity : Activity() {
       if (hit) correct++
       val cur = perTool[expected] ?: (0 to 0)
       perTool[expected] = (cur.first + (if (hit) 1 else 0)) to (cur.second + 1)
-      say("TOOL hit=$hit expected=$expected got=${got ?: "null"} ms=${r?.totalMs} prompt=${prompt.take(48)}")
+      say("TOOL hit=$hit expected=$expected got=${got ?: "null"} ms=${r?.totalMs} prompt=${prompt.take(48)} text=${(r?.text ?: "").replace(Regex("\\s+"), " ").take(70)}")
     }
 
     say("TOOL_SUMMARY correct=$correct total=${toolCases().size} accuracy=${correct.toDouble() / toolCases().size} no_output=$noOutput")
@@ -169,7 +176,89 @@ class GemmaBenchActivity : Activity() {
     say("DONE")
   }
 
-  private data class Gen(val text: String, val chars: Int, val firstChunkMs: Long, val totalMs: Long)
+  /**
+   * Measures tool selection the way the model was actually trained for it.
+   *
+   * The prompted phase above puts a JSON schema in the instruction and scores the
+   * text that comes back. FunctionGemma answers that with "I am FunctionGemma, a
+   * model optimized for function calls. I can only assist with requests..." --
+   * a refusal of the format, scored as if it were a wrong tool. This phase
+   * registers the tools properly and reads Message.toolCalls.
+   *
+   * Two API costs are paid here, both noted because they are why this phase is
+   * separate rather than the only phase:
+   *
+   *  - ToolProvider's single abstract method is name-mangled
+   *    (provideTools$third_party_odml_...), so this overrides an internal symbol
+   *    that carries no compatibility guarantee. It is backtick-escaped below and
+   *    pinned to a literal, because a rename is a compile error rather than a
+   *    silent behaviour change.
+   *  - ToolSet offers no public members at all; tools are supplied as
+   *    InternalJsonTool instances rather than through the @Tool annotation,
+   *    which would drag in kotlin-reflect for ReflectionTool.
+   *
+   * automaticToolCalling is false on purpose. With it true, LiteRT executes the
+   * tool and folds the result back into the transcript, which is what production
+   * wants and exactly what a selection benchmark must not do -- the whole
+   * question is which tool got chosen.
+   */
+  private fun runNativeToolPhase(engine: Engine) {
+    say("NATIVE_SYS ${sysInstruction ?: "<none>"}")
+    say("")
+    say("=== NATIVE TOOL CALLS ===")
+    // Prove the tools actually reached the model before scoring anything. An empty
+    // provider and a model that ignores tools produce identical logs -- zero calls --
+    // so without this the run cannot distinguish "will not call tools" from "was
+    // never offered any".
+    val offered = ToolManager(listOf(BenchTools.Provider())).getToolsDescription()
+    say("NATIVE_OFFERED tools=${offered.size()}")
+    if (offered.size() > 0) say("NATIVE_OFFERED_SAMPLE ${offered[0]}")
+    var correct = 0
+    var noCall = 0
+    val perTool = mutableMapOf<String, Pair<Int, Int>>()
+
+    for ((prompt, expected) in toolCases()) {
+      // FunctionGemma was fine-tuned with a system preface that puts it into
+      // function-calling mode. Without it the model answers "I do not have a tool
+      // available" while seven tools are listed, so the preface is worth testing
+      // rather than assuming the model is simply incapable.
+      val sys = sysInstruction
+      val convo =
+          engine.createConversation(
+              ConversationConfig(
+                  systemInstruction = if (sys.isNullOrBlank()) null else Contents.of(sys),
+                  tools = listOf(BenchTools.Provider()),
+                  automaticToolCalling = false,
+              ))
+      val r = stream(convo, prompt, maxTokens = 96)
+      val calls = r?.calls.orEmpty()
+      // First call wins: a model asked for one tool that emits several is still
+      // making a choice, and scoring the last one instead would reward rambling.
+      val got = calls.firstOrNull()
+      if (calls.isEmpty()) noCall++
+      val hit = got == expected
+      if (hit) correct++
+      val cur = perTool[expected] ?: (0 to 0)
+      perTool[expected] = (cur.first + (if (hit) 1 else 0)) to (cur.second + 1)
+      say(
+          "NATIVE hit=$hit expected=$expected got=${got ?: "none"} calls=${calls.size} ms=${r?.totalMs} prompt=${prompt.take(48)} text=${(r?.text ?: "").replace(Regex("\\s+"), " ").take(70)}")
+    }
+
+    val n = toolCases().size
+    say("NATIVE_SUMMARY correct=$correct total=$n accuracy=${correct.toDouble() / n} no_tool_call=$noCall")
+    for ((t, v) in perTool.entries.sortedBy { it.key }) {
+      say("NATIVE_PER_TOOL $t ${v.first}/${v.second}")
+    }
+  }
+
+    private data class Gen(
+      val text: String,
+      val chars: Int,
+      val firstChunkMs: Long,
+      val totalMs: Long,
+      // Tool names the model emitted natively, in order.
+      val calls: List<String> = emptyList(),
+  )
 
   /**
    * Streams one turn, recording when the first chunk arrived.
@@ -183,6 +272,11 @@ class GemmaBenchActivity : Activity() {
     val sb = StringBuilder()
     var first = -1L
     val done = AtomicBoolean(false)
+    // Collected from the messages themselves rather than parsed out of the text.
+    // A natively tool-calling model returns tool calls as structured data on
+    // Message.toolCalls, and scraping the rendered string for a JSON fragment is
+    // exactly the guesswork this path exists to avoid.
+    val calls = java.util.concurrent.CopyOnWriteArrayList<String>()
     // Explicitly typed: bare nulls make the compiler unable to choose between the
     // MessageCallback and Flow overloads of sendMessageAsync.
     val noExtras: Map<String, Any> = emptyMap()
@@ -199,6 +293,9 @@ class GemmaBenchActivity : Activity() {
             override fun onMessage(m: Message) {
               if (first < 0) first = System.currentTimeMillis() - start
               sb.append(m.toString())
+              for (tc in m.toolCalls) {
+                if (tc.name.isNotEmpty()) calls.add(tc.name)
+              }
             }
 
             override fun onDone() {
@@ -226,7 +323,7 @@ class GemmaBenchActivity : Activity() {
         say("STREAM empty after ${total}ms")
         null
       } else {
-        Gen(sb.toString(), sb.length, first, total)
+        Gen(sb.toString(), sb.length, first, total, calls.toList())
       }
     } catch (t: Throwable) {
       say("STREAM_FAIL ${t}")
@@ -293,6 +390,8 @@ class GemmaBenchActivity : Activity() {
 
   private fun List<Double>.averageOrNull(): String =
       if (isEmpty()) "n/a" else String.format("%.2f", average())
+
+  private var sysInstruction: String? = null
 
   companion object {
     const val TAG = "GemmaBench"

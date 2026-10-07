@@ -56,5 +56,13 @@
             android:name=".EmbeddingRouterActivity"
             android:exported="true"
             android:label="Embedding router probe" />
+
+        <!-- Loads a LiteRT-LM .litertlm file from this app's own storage and
+             measures load time, time-to-first-token, decode rate, peak RSS and
+             tool-call accuracy. No launcher entry, no user input. -->
+        <activity
+            android:name=".GemmaBenchActivity"
+            android:exported="true"
+            android:label="Gemma 4 E2B benchmark" />
     </application>
 </manifest>

@@ -136,13 +136,21 @@ class GemmaBenchActivity : Activity() {
 
     // --- tool-call accuracy ------------------------------------------------
     val tools = assistantLocalAssistantTools()
-    val convo = engine.createConversation(ConversationConfig())
     var correct = 0
+    var noOutput = 0
     val perTool = mutableMapOf<String, Pair<Int, Int>>() // tool -> (hit, total)
 
     for ((prompt, expected) in toolCases()) {
+      // A fresh conversation per case, and this is not a style choice. Reusing one
+      // conversation accumulates 15 turns of tool schemas, prompts and replies into
+      // a 1024-entry KV cache. Cases after the sixth die with "Prefill input length
+      // exceeds available state entries", and every one of them scores as a miss --
+      // so the run measures context exhaustion and reports it as bad tool selection.
+      // Each case here is independent, so each gets an empty context.
+      val convo = engine.createConversation(ConversationConfig())
       val full = "$tools\n\nUser request: $prompt\n\nAnswer with only a JSON object of the form {\"tool\":\"<name>\",\"arguments\":{}}. No other text."
       val r = stream(convo, full, maxTokens = 64)
+      if (r?.text.isNullOrBlank()) noOutput++
       val got = extractToolName(r?.text ?: "")
       val hit = got == expected
       if (hit) correct++
@@ -151,7 +159,7 @@ class GemmaBenchActivity : Activity() {
       say("TOOL hit=$hit expected=$expected got=${got ?: "null"} ms=${r?.totalMs} prompt=${prompt.take(48)}")
     }
 
-    say("TOOL_SUMMARY correct=$correct total=${toolCases().size} accuracy=${correct.toDouble() / toolCases().size}")
+    say("TOOL_SUMMARY correct=$correct total=${toolCases().size} accuracy=${correct.toDouble() / toolCases().size} no_output=$noOutput")
     for ((t, v) in perTool.entries.sortedBy { it.key }) {
       say("TOOL_PER_TOOL $t ${v.first}/${v.second}")
     }

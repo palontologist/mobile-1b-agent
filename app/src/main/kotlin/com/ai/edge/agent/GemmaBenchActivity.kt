@@ -118,7 +118,18 @@ class GemmaBenchActivity : Activity() {
     val loadMs = System.currentTimeMillis() - t0
     say("ENGINE_INIT ms=$loadMs rss_mb=${peakRssMb()}")
 
+    // Phases can be selected so a slow or large model can be smoke-tested before
+    // committing to the full suite. Gemma 4 E2B on a 3.6 GB phone took 70 s to load
+    // and was killed twice mid-run on 0.16.0; re-running the whole thing to find that
+    // out again costs a 2.5 GB model download each time.
+    val phases = intent.getStringExtra("phases") ?: "load,gen,native,prompted"
+    val wantGen = phases.contains("gen")
+    val wantNative = phases.contains("native")
+    val wantPrompted = phases.contains("prompted")
+    say("PHASES $phases")
+
     // --- generation --------------------------------------------------------
+    if (wantGen) {
     val gen = engine.createConversation(ConversationConfig())
     val prompts =
         listOf(
@@ -141,12 +152,13 @@ class GemmaBenchActivity : Activity() {
       )
     }
     say("GEN_SUMMARY ttft_median_ms=${ttfts.medianOr0()} decode_toks_per_sec=${rates.averageOrNull()}")
+    }
 
-    // --- tool-call accuracy ------------------------------------------------
     // --- tool-call accuracy, native ------------------------------------------
-    runNativeToolPhase(engine)
+    if (wantNative) runNativeToolPhase(engine)
 
     // --- tool-call accuracy, prompted ----------------------------------------
+    if (wantPrompted) {
     val tools = assistantLocalAssistantTools()
     var correct = 0
     var noOutput = 0
@@ -174,6 +186,7 @@ class GemmaBenchActivity : Activity() {
     say("TOOL_SUMMARY correct=$correct total=${toolCases().size} accuracy=${correct.toDouble() / toolCases().size} no_output=$noOutput")
     for ((t, v) in perTool.entries.sortedBy { it.key }) {
       say("TOOL_PER_TOOL $t ${v.first}/${v.second}")
+    }
     }
 
     say("FINAL rss_mb=${peakRssMb()}")

@@ -72,7 +72,7 @@ kotlin {
 // sample's gradle/libs.versions.toml, which pins the same coordinate.
 // Consumed by ToolRoutingProbeActivity; the torch probe needs none of this.
 dependencies {
-    implementation("com.google.ai.edge.litertlm:litertlm-android:0.16.0")
+    implementation("com.google.ai.edge.litertlm:litertlm-android:0.18.0")
     // CompiledModel API for the embedding-router probe (Interpreter would also
     // work, but the recipe's on-device discipline uses CompiledModel so a CPU run
     // and a GPU run share one code path).

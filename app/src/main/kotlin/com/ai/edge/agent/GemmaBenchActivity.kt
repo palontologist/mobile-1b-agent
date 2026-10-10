@@ -96,13 +96,18 @@ class GemmaBenchActivity : Activity() {
     // --- engine load -------------------------------------------------------
     val t0 = System.currentTimeMillis()
     var engine: Engine? = null
+    // 0.18.0 requires the cache directory to already exist:
+    //   INVALID_ARGUMENT: Cache directory does not exist or is not writable
+    // 0.16.0 created it on demand. mkdirs() is a no-op when it is already there,
+    // so this works on both rather than branching on version.
+    val lmCache = File(cacheDir, "litertlm").apply { mkdirs() }
     try {
       engine =
           Engine(
               EngineConfig(
                   modelPath = modelPath,
                   backend = Backend.CPU(threadCount = 4),
-                  cacheDir = File(cacheDir, "litertlm").absolutePath,
+                  cacheDir = lmCache.absolutePath,
               )
           )
       engine.initialize()

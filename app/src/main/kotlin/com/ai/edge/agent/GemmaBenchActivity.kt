@@ -77,6 +77,7 @@ class GemmaBenchActivity : Activity() {
 
     val modelPath = intent.getStringExtra("model") ?: DEFAULT_MODEL
     sysInstruction = intent.getStringExtra("sysinst")
+    toolSet = intent.getStringExtra("toolset") ?: "home"
     Thread { run(modelPath) }.start()
   }
 
@@ -164,7 +165,8 @@ class GemmaBenchActivity : Activity() {
     var noOutput = 0
     val perTool = mutableMapOf<String, Pair<Int, Int>>() // tool -> (hit, total)
 
-    for ((prompt, expected) in toolCases()) {
+    val cases = if (toolSet == "mobile") mobileToolCases() else toolCases()
+    for ((prompt, expected) in cases) {
       // A fresh conversation per case, and this is not a style choice. Reusing one
       // conversation accumulates 15 turns of tool schemas, prompts and replies into
       // a 1024-entry KV cache. Cases after the sixth die with "Prefill input length
@@ -235,7 +237,8 @@ class GemmaBenchActivity : Activity() {
     var noCall = 0
     val perTool = mutableMapOf<String, Pair<Int, Int>>()
 
-    for ((prompt, expected) in toolCases()) {
+    val cases = if (toolSet == "mobile") mobileToolCases() else toolCases()
+    for ((prompt, expected) in cases) {
       // FunctionGemma was fine-tuned with a system preface that puts it into
       // function-calling mode. Without it the model answers "I do not have a tool
       // available" while seven tools are listed, so the preface is worth testing
@@ -245,7 +248,10 @@ class GemmaBenchActivity : Activity() {
           engine.createConversation(
               ConversationConfig(
                   systemInstruction = if (sys.isNullOrBlank()) null else Contents.of(sys),
-                  tools = listOf(BenchTools.Provider()),
+                  tools =
+                      listOf(
+                          if (toolSet == "mobile") BenchTools.MobileProvider()
+                          else BenchTools.Provider()),
                   automaticToolCalling = false,
               ))
       val r = stream(convo, prompt, maxTokens = 96)
@@ -263,7 +269,7 @@ class GemmaBenchActivity : Activity() {
     }
 
     val n = toolCases().size
-    say("NATIVE_SUMMARY correct=$correct total=$n accuracy=${correct.toDouble() / n} no_tool_call=$noCall")
+    say("NATIVE_SUMMARY correct=$correct total=$n accuracy=${correct.toDouble() / n} no_tool_call=$noCall toolset=$toolSet")
     for ((t, v) in perTool.entries.sortedBy { it.key }) {
       say("NATIVE_PER_TOOL $t ${v.first}/${v.second}")
     }
@@ -368,6 +374,30 @@ class GemmaBenchActivity : Activity() {
       set_timer(minutes) - set a countdown
       """.trimIndent()
 
+  /**
+   * Prompts aimed at the action set this model was fine-tuned on, mirroring the
+   * literal/paraphrase pairing in litert-samples#349. The pairing matters: without
+   * it a keyword matcher scores near 100% and looks production-ready.
+   */
+  private fun mobileToolCases(): List<Pair<String, String>> =
+      listOf(
+          "what is on my calendar today" to "get_calendar_events",
+          "do i have meetings today" to "get_calendar_events",
+          "calendar today" to "get_calendar_events",
+          "whats on my calender today" to "get_calendar_events",
+          "take a picture" to "take_photo",
+          "snap a photo" to "take_photo",
+          "set an alarm for 7am" to "set_alarm",
+          "wake me up at 6" to "set_alarm",
+          "turn on the flashlight" to "turn_on_flashlight",
+          "switch the torch on" to "turn_on_flashlight",
+          "turn off the flashlight" to "turn_off_flashlight",
+          "switch the torch off" to "turn_off_flashlight",
+          "text marco about bread" to "send_message",
+          "send a message to marco" to "send_message",
+          "make a note about the invoice" to "create_note",
+      )
+
   private fun toolCases(): List<Pair<String, String>> =
       listOf(
           "what time is it right now" to "get_current_time",
@@ -410,6 +440,9 @@ class GemmaBenchActivity : Activity() {
       if (isEmpty()) "n/a" else String.format("%.2f", average())
 
   private var sysInstruction: String? = null
+
+  /** "home" (default) or "mobile" -- see BenchTools.MobileProvider. */
+  private var toolSet: String = "home"
 
   companion object {
     const val TAG = "GemmaBench"

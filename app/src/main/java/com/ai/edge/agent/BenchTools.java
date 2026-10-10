@@ -105,6 +105,43 @@ public final class BenchTools {
     }
   }
 
+  /**
+   * The tool contract FunctionGemma 270M was actually fine-tuned on.
+   *
+   * <p>Added after measuring 0/15 against a home-grown action set. The hypothesis
+   * worth testing is that the model learned a fixed prompt contract rather than
+   * general tool selection: mobile-actions is a fine-tune of functiongemma-270m-it
+   * over one specific action set, so offering a different set of names and
+   * descriptions may be asking it to generalize where it was never trained to.
+   *
+   * <p>Names and count follow the set described in litert-samples#349 (flashlight,
+   * calendar, photo, alarm, message, note, no-op), which is where the 28% figure came
+   * from. If this scores well where the other set scored zero, the earlier result was
+   * measuring contract mismatch and not model capability.
+   */
+  private static final String[][] MOBILE_SPECS = {
+    {"turn_on_flashlight", "Turns on the phone flashlight"},
+    {"turn_off_flashlight", "Turns off the phone flashlight"},
+    {"get_calendar_events", "Lists the events on the user's calendar"},
+    {"take_photo", "Takes a photo with the camera"},
+    {"set_alarm", "Sets an alarm"},
+    {"send_message", "Sends a text message"},
+    {"create_note", "Creates a note"},
+    {"no_op", "Does nothing"},
+  };
+
+  public static final class MobileProvider extends ToolProvider {
+    @Override
+    public Map<String, InternalJsonTool>
+        provideTools$third_party_odml_litert_lm_kotlin_java_com_google_ai_edge_litertlm_litertlm_android() {
+      Map<String, InternalJsonTool> out = new LinkedHashMap<>();
+      for (String[] spec : MOBILE_SPECS) {
+        out.put(spec[0], new Tool(spec[0], spec[1], new String[0]));
+      }
+      return out;
+    }
+  }
+
   public static final class Provider extends ToolProvider {
     @Override
     public Map<String, InternalJsonTool>

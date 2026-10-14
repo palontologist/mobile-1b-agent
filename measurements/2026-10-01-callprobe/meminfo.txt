@@ -1,0 +1,59 @@
+Applications Memory Usage (in Kilobytes):
+Uptime: 326636519 Realtime: 645405679
+
+** MEMINFO in pid 27171 [com.ai.edge.agent] **
+                   Pss  Private  Private  SwapPss      Rss     Heap     Heap     Heap
+                 Total    Dirty    Clean    Dirty    Total     Size    Alloc     Free
+                ------   ------   ------   ------   ------   ------   ------   ------
+  Native Heap    10532    10476        8       78    11444    19472    16978     2493
+  Dalvik Heap     1210     1156       24      158     1804     8578     2434     6144
+ Dalvik Other     8936     1784        0        2    16304                           
+        Stack      780      780        0        0      784                           
+       Ashmem       20        0        0        0      496                           
+    Other dev       30        8       12        0      428                           
+     .so mmap     8856      164     1860       36    37240                           
+    .jar mmap     8625        0     3948        0    42144                           
+    .apk mmap      613        0      288        0     2024                           
+    .ttf mmap      158        0       52        0      364                           
+    .dex mmap    13651    13632        0        0    14292                           
+    .oat mmap      103        0       20        1     1176                           
+    .art mmap     9055     7540      688      125    17120                           
+   Other mmap       87        4       48        0      692                           
+      Unknown      635      504       68        6     1212                           
+        TOTAL    63697    36048     7016      406   147524    28050    19412     8637
+ 
+ App Summary
+                       Pss(KB)                        Rss(KB)
+                        ------                         ------
+           Java Heap:     9384                          18924
+         Native Heap:    10476                          11444
+                Code:    20248                         111828
+               Stack:      780                            784
+            Graphics:        0                              0
+       Private Other:     2176
+              System:    20633
+             Unknown:                                    4544
+ 
+           TOTAL PSS:    63697            TOTAL RSS:   147524       TOTAL SWAP PSS:      406
+ 
+ Objects
+               Views:       19         ViewRootImpl:        1
+         AppContexts:        5           Activities:        1
+              Assets:       28        AssetManagers:        0
+       Local Binders:       14        Proxy Binders:       66
+       Parcel memory:        6         Parcel count:       24
+    Death Recipients:        1             WebViews:        0
+ 
+ SQL
+         MEMORY_USED:      262
+  PAGECACHE_OVERFLOW:       93          MALLOC_SIZE:       46
+ 
+ DATABASES
+      pgsz     dbsz   Lookaside(b) cache hits cache misses cache size  Dbname
+PER CONNECTION STATS
+         4      104            112     4    38     6  /data/user/0/com.ai.edge.agent/no_backup/androidx.work.workdb
+         4        8                    0     0     0    (attached) temp
+         4      104             25     4    14     2  /data/user/0/com.ai.edge.agent/no_backup/androidx.work.workdb (2)
+POOL STATS
+     cache hits  cache misses    cache size  Dbname
+             10            68            78  /data/user/0/com.ai.edge.agent/no_backup/androidx.work.workdb

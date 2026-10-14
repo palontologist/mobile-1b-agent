@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Phone Assistant skills.
+
+  Two capability flags, and the justification for each:
+    retrieveInteractiveWindows + reportViewIds  — read_screen / find_text need to walk
+      the active window's node tree and identify views. This is the core of a skills
+      layer; without it the service cannot perceive anything.
+    canPerformGestures                         — tap() dispatches a synthetic touch so a
+      skill can act on what it just found.
+
+  Deliberately NOT requested, and worth noting why each is absent:
+    canRetrieveWindowContent is implied by the two above and adds nothing extra here.
+    performAction with ACTION_SET_TEXT (typing) is intentionally unimplemented rather
+    than half-enabled: see PhoneSkillsService.typeText.
+
+  This service does not react to events. eventTypes is set to the minimum that lets
+  the framework permit our on-command reads; onAccessibilityEvent is a no-op.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/accessibility_skills_description"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows|flagIncludeNotImportantViews"
+    android:canPerformGestures="true"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="100"
+    android:settingsActivity="com.ai.edge.agent.MainActivity" />

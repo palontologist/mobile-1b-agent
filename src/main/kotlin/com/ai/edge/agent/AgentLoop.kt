@@ -5,11 +5,19 @@
  * Interval: 500ms (configurable)
  * Fallback: NPU → CPU graceful degrade (handled at LiteRT CompiledModel level)
  * 
+ * Phase 2 Features:
+ * - Calendar integration (Google Calendar API)
+ * - SQLite-based note persistence
+ * - TtsConfig for text-to-speech
+ * - ErrorLogger for crash reporting
+ * - BatteryOptimizer for power management
+ * 
  * Key stability patterns:
  * - Batch size 1 for RAM safety (3.5G on SM-A14)
  * - Error boundaries per action (one failure ≠ loop crash)
  * - TTS only on user-initiated events (not spurious)
  * - Context window limited to last 5 interactions
+ * - Battery-aware loop interval
  */
 package com.ai.edge.agent
 
@@ -24,11 +32,11 @@ import kotlin.concurrent.*;
  * 
  * Runs as a Runnable posted to Main Looper at fixed intervals.
  * Each iteration:
- *   1. Perceive: Gather context (audio/sensors/notifications - simplified here)
- *   2. Reason:   FunctionGemma.generate(prompt) → JSON function call
- *   3. Act:      ActionRegistry.execute(function, parameters, ctx)
- *   4. Memory:   Store (input, function, outcome) in Room/SQLite
- *   5. Loop:     Post self to handler again after interval
+ *   1. PERCEIVE: Gather context (audio/sensors/notifications/calendar)
+ *   2. REASON:   FunctionGemma.generate(prompt) → JSON function call
+ *   3. ACT:      ActionRegistry.execute(function, parameters, ctx) → ActionResult
+ *   5. MEMORY:   Store (input, function, outcome) in SQLite
+ *   6. LOOP:     Post self to handler with battery-aware interval
  */
 class AgentLoop(
     private val ctx: Context,
@@ -37,8 +45,17 @@ class AgentLoop(
     private val loopIntervalMs: Long = 500
 ) : Runnable {
 
+    // -----------------------------------------------------------------
+    // Components (Phase 2 additions)
+    // -----------------------------------------------------------------
     private val handler = Handler(ctx.mainLooper)
-    private val memory = AgentMemory(ctx)  // Simple SQLite/Room wrapper
+    private val batteryOptimizer = BatteryOptimizer().apply { init(ctx) }
+    private val calendarService = CalendarService(ctx, "")
+    private val noteManager = NoteManager().apply { init(ctx) }
+    private val ttsConfig = TtsConfig().apply { init(ctx) }
+    private val errorLogger = ErrorLogger()
+    
+    private val memory = NoteDatabase(ctx)  // SQLite-based persistence
     private var consecutiveErrors = 0
     private val maxConsecutiveErrors = 3
 
@@ -46,10 +63,7 @@ class AgentLoop(
     // Agent Loop Entry Point
     // -----------------------------------------------------------------
 
-    /**
-     * Start the perpetual agent loop.
-     * Call once on app startup (after FunctionGemma model loaded).
-     */
+    /** Start the perpetual agent loop. */
     fun start() {
         handler.post(this)
         Log.i("AgentLoop", "Agent loop started — ${loopIntervalMs}ms intervals")
@@ -59,6 +73,7 @@ class AgentLoop(
     fun stop() {
         handler.removeCallbacks(this)
         Log.i("AgentLoop", "Agent loop stopped")
+        ttsConfig.shutdown()
     }
 
     // -----------------------------------------------------------------
@@ -68,9 +83,8 @@ class AgentLoop(
     override fun run() {
         try {
             // ---- 1. PERCEIVE ----
-            // In production: AudioRecord → STT → extract user intent / context
-            // Here we use the pre-supplied inputContext (from last STT result)
-            val perceivedContext = inputContext
+            // Gather context from various sources
+            val perceivedContext = perceiveContext()
 
             // ---- 2. REASON ----
             // Build prompt for FunctionGemma including memory context
@@ -97,12 +111,11 @@ class AgentLoop(
                 )
 
                 // ---- 4. MEMORY ----
-                // Persist the full cycle for context continuity
+                // Persist the full cycle in SQLite for context continuity
                 memory.store(
                     input = perceivedContext,
                     function = functionName,
                     outcome = result.success ? "success" : "error: ${result.error}",
-                    confidence = 1.0f,  // FunctionGemma confidence would go here
                     speakText = result.speak_text,
                     shouldSpeak = result.should_speak
                 )
@@ -112,49 +125,77 @@ class AgentLoop(
                     consecutiveErrors = 0  // Reset on success
                 } else {
                     consecutiveErrors++
-                    Log.w(
+                    errorLogger.logError(
+                        ctx,
                         "AgentLoop",
                         "Action $functionName failed (consecutive: $consecutiveErrors/${maxConsecutiveErrors})"
                     )
                 }
 
                 // Optionally speak result (TTS) - but only for notable outcomes
-                if (result.should_speak && result.speak_text != null) {
-                    speak(result.speak_text)
-                }
+                TtsConfig.speakIfNeeded(result.should_speak, result.speak_text, ctx)
             }
 
         } catch (e: Exception) {
             // ---- Error Boundary ----
             consecutiveErrors++
-            Log.e("AgentLoop", "Uncaught error in agent loop iteration $consecutiveErrors", e)
+            errorLogger.logError(
+                ctx,
+                "AgentLoop",
+                "Uncaught error in agent loop iteration $consecutiveErrors",
+                e
+            )
 
             // Longer backoff after multiple errors
             if (consecutiveErrors >= maxConsecutiveErrors) {
-                // 2s pause instead of 500ms to avoid tight error loop
+                // 2s pause instead of standard interval
                 handler.postDelayed(this, 2000)
                 consecutiveErrors = 0  // Reset after backoff
                 return
             }
         }
 
-        // ---- 5. Loop (reschedule) ----
-        // Only post if not stopped
+        // ---- 5. Loop (reschedule with battery awareness) ----
+        // Get battery-aware interval and reschedule
+        val nextInterval = batteryOptimizer.getRecommendedInterval()
         if (!Thread.currentThread().isInterrupted) {
-            handler.postDelayed(this, loopIntervalMs)
+            handler.postDelayed(this, nextInterval)
         }
     }
 
     // -----------------------------------------------------------------
-    // Prompt Building: Include memory/context for FunctionGemma
+    // 1. PERCEIVE: Gather context from various sources
+    // -----------------------------------------------------------------
+    private fun perceiveContext(): String {
+        // 1. Start with the input context (from last STT result)
+        var context = inputContext
+        
+        // 2. Add calendar events (next 1-2 events)
+        val calendarEvents = calendarService.getTodayEvents()
+        if (calendarEvents.isNotEmpty()) {
+            context = "$context | Calendar: ${calendarEvents.joinToString(" | ")}"
+        }
+        
+        // 3. Add recent notes (last 2)
+        val recentNotes = noteManager.getRecentNotes(2)
+        if (recentNotes.isNotEmpty()) {
+            val noteText = recentNotes.joinToString(" | ")
+            context = "$context | Notes: $noteText"
+        }
+        
+        return context
+    }
+
+    // -----------------------------------------------------------------
+    // 2. REASON: Build prompt for FunctionGemma
     // -----------------------------------------------------------------
     private fun buildPrompt(currentContext: String): String {
-        // Retrieve last 3 interactions from memory to include as context
-        val recent = memory.getRecentContexts(3)
+        // Retrieve last 5 interactions from SQLite for context
+        val recent interactions: List<String> = memory.getRecentInteractions(5)
 
-        val contextSection = if (recent.isNotEmpty()) {
+        val contextSection = if (recent interactions.isNotEmpty()) {
             "Previous interactions:\n" +
-                recent.joinToString("\n") + "\n\n"
+                recent interactions.joinToString("\n") + "\n\n"
         } else {
             ""
         }
@@ -162,7 +203,7 @@ class AgentLoop(
         val basePrompt = """
             |You are FunctionGemma 270M on-device AI for Samsung SM-A14.
             |Available actions (return JSON only, no prose):
-            |
+            
             |open_flashlight       → {"name": "open_flashlight", "parameters": {}}
             |close_flashlight     → {"name": "close_flashlight", "parameters": {}}
             |query_calendar       → {"name": "query_calendar", "parameters": {}}
@@ -183,6 +224,20 @@ class AgentLoop(
     }
 
     // -----------------------------------------------------------------
+    // 3. ACT: Execute action via ActionRegistry
+    // -----------------------------------------------------------------
+    // (Same as before - ActionRegistry.execute)
+
+    // -----------------------------------------------------------------
+    // 4. MEMORY: SQLite-based persistence
+    // -----------------------------------------------------------------
+    // (Already in AgentMemory → replaced with NoteDatabase)
+
+    // -----------------------------------------------------------------
+    // 5. Loop with battery awareness
+    // -----------------------------------------------------------------
+
+    // -----------------------------------------------------------------
     // FunctionGemma Inference (LiteRT CompiledModel)
     // -----------------------------------------------------------------
     private fun runFunctionGemma(prompt: String): String {
@@ -193,17 +248,7 @@ class AgentLoop(
 
             // TODO: Proper tokenization/embedding of prompt string
             // For now, placeholder: the CompiledModel expects float input
-            // In production, use Tokenizer → input_ids → input_tensor
             
-            // Simplified: feed prompt as float array (real impl needs proper tokenizer)
-            // This is where the 270M model actually runs - tokenized text → logits → function probs
-            
-            // Placeholder implementation - in production this would be:
-            // 1. tokenizer.encode(prompt) → input_ids
-            // 2. input_ids → float32 tensor [1, seq_len, embed_dim]
-            // 3. functionGemma.run(inputBuffers, outputBuffers)
-            // 4. outputBuffers[0].readFloat() → decode function name
-
             // For now, simulate a function call based on prompt keywords
             return simulateFunctionGemmaResponse(prompt)
 
@@ -213,10 +258,9 @@ class AgentLoop(
         }
     }
 
-    /**
-     * Simulated FunctionGemma response for demo/prototyping.
-     * In production, replace with actual CompiledModel inference.
-     */
+    // -----------------------------------------------------------------
+    // Simulated FunctionGemma response (placeholder)
+    // -----------------------------------------------------------------
     private fun simulateFunctionGemmaResponse(prompt: String): String {
         val lower = prompt.toLowerCase()
 
@@ -232,7 +276,6 @@ class AgentLoop(
         } else if (lower.contains("photo") || lower.contains("picture")) {
             return """{"name": "take_photo", "parameters": {}}"""
         } else {
-            // Default: no-op or ask for clarification
             return """{"name": "noop", "parameters": {}}"""
         }
     }
@@ -247,22 +290,14 @@ class AgentLoop(
 
     private fun parseFunctionCall(gemmaOutput: String): ParsedFunction? {
         try {
-            // The model should output clean JSON like:
-            // {"name": "open_flashlight", "parameters": {}}
-            
-            // Clean up any surrounding text (model may add newlines, prefixes)
             val cleaned = gemmaOutput.trim().replace("\n", " ").trim()
-            
-            // Extract JSON object (simple approach - find { … })
             val jsonStart = cleaned.indexOf('{')
             val jsonEnd = cleaned.lastIndexOf('}') + 1
-            if (jsonStart < 0 || jsonEnd <= jsonStart) {
-                return null
-            }
-            
+            if (jsonStart < 0 || jsonEnd <= jsonStart) return null
+
             val jsonStr = cleaned.substring(jsonStart, jsonEnd)
             val parse = JSONObject(jsonStr)
-            
+
             val functionName = parse.getString("name")
             val parameters = if (parse.has("parameters")) {
                 val paramsMap = mutableMapOf<String, Any>()
@@ -271,7 +306,7 @@ class AgentLoop(
                 while (keys.hasNext()) {
                     val key = keys.next()
                     paramsMap[key] = when (opt.get(key)) {
-                        is JSONObject -> opt.getJSONObject(key).toString() // nested if needed
+                        is JSONObject -> opt.getJSONObject(key).toString()
                         is JSONArray -> opt.getJSONArray(key).toString()
                         else -> opt.getString(key)
                     }
@@ -280,8 +315,7 @@ class AgentLoop(
             } else {
                 null
             }
-            
-            // Validate function is registered
+
             if (ActionRegistry.isFunctionRegistered(functionName)) {
                 return ParsedFunction(functionName, parameters)
             } else {
@@ -295,84 +329,100 @@ class AgentLoop(
     }
 
     // -----------------------------------------------------------------
-    // TTS Helper (lightweight, only on notable outcomes)
+    // TTS Helper (using TtsConfig)
     // -----------------------------------------------------------------
     private fun speak(text: String) {
-        try {
-            val tts = ctx.getSystemService(TextToSpeech::class.java)
-            if (tts.isLanguageAvailable("en-US") >= TextToSpeech.AVAILABLE) {
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, "uniqueId")
+        TtsConfig.speak(text, ctx)
+    }
+
+    // -----------------------------------------------------------------
+    // Inner Classes (Phase 2 components)
+    // -----------------------------------------------------------------
+
+    /** BatteryOptimizer - Phase 2 component */
+    private class BatteryOptimizer(private var ctx: Context?) {
+        private var lastCheck = 0L
+        private val CHECK_INTERVAL = 60000L
+
+        fun init(c: Context) = context = c
+
+        fun getRecommendedInterval(): Long {
+            if (context == null) return 500L
+
+            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            val isCharging = batteryManager.isChargingPlugPresent(BatteryManager.PLUG_AC)
+            val batteryTemperature = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_TEMPERATURE) / 10
+
+            var interval = 500L
+            when {
+                isChargingPlugPresent(BatteryManager.PLUG_AC) -> interval = 500L
+                level <= 15 -> interval = 5000L
+                level <= 30 -> interval = 1000L
+                batteryTemperature >= 45 -> interval = 2000L
+                else -> interval = 500L
             }
-        } catch (e: Exception) {
-            // TTS failure is non-critical - just log
-            Log.d("AgentLoop", "TTS error (non-critical): ${e.message}")
+
+            val now = System.currentTimeMillis()
+            if (now - lastCheck < 60000L) return interval
+            lastCheck = now
+
+            Log.d("BatteryOptimizer", "Battery: ${level}%, Interval: ${interval}ms")
+            return interval
+        }
+
+        private fun isChargingPlugPresent(plug: String): Boolean {
+            // Simplified check - in production use the full API
+            val bm = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            return bm.isCharging
+        }
+    }
+
+    /** NoteManager - Phase 2 component (SQLite-based) */
+    private class NoteManager(private val ctx: Context) {
+        private lateinit var dbHelper: NoteDbHelper
+
+        init {
+            dbHelper = NoteDbHelper(ctx)
+        }
+
+        fun appendNote(title: String, content: String): Boolean {
+            return NoteManagerKt.appendNote(title, content)
+        }
+
+        fun getRecentNotes(count: Int): List<NoteDbHelper.Note> {
+            return dbHelper.getRecentNotes(count)
+        }
+    }
+
+    /** ErrorLogger - Phase 2 component */
+    private class ErrorLoggerImpl {
+        fun logError(context: Context, tag: String, message: String, throwable: Throwable?) {
+            ErrorLogger.logError(context, tag, message, throwable)
         }
     }
 }
 
 /**
- * SimpleAgentMemory - Persists agent cycle context across app restarts.
- * 
- * In production, this would be a Room/SQLite database.
- * For this prototype, we use SharedPreferences with limited history.
+ * Helper object for NoteManagerKt (SQLite operations)
  */
-private class AgentMemory(
-    private val ctx: Context
-) {
-    private val prefs = ctx.getSharedPreferences("agent_memory", Context.MODE_PRIVATE)
-    private val GOTCHA_KEY = "agent_history"
-    private val MAX_HISTORY = 10  // Keep last 10 interactions
+object NoteManagerKt {
+    private lateinit var dbHelper: NoteDbHelper
 
-    /**
-     * Store one agent cycle: input, function, outcome, speak flags.
-     */
-    fun store(
-        input: String,
-        function: String,
-        outcome: String,
-        confidence: Float,
-        speakText: String? = null,
-        shouldSpeak: Boolean = false
-    ) {
-        try {
-            val json = JSONObject().apply {
-                put("input", input)
-                put("function", function)
-                put("outcome", outcome)
-                put("timestamp", System.currentTimeMillis())
-                put("confidence", confidence)
-            }
-
-            // Prepend to history (newest first)
-            val history = getHistory()
-            history.add(0, json.toString())
-
-            // Trim to max
-            val trimmed = history.take(MAX_HISTORY)
-
-            // Save back
-            val editor = prefs.edit()
-            editor.putString(GOTCHA_KEY, trimmed.joinToString("\n"))
-            editor.apply()
-        } catch (e: Exception) {
-            Log.d("AgentMemory", "Failed to store memory: ${e.message}")
-        }
+    fun init(context: Context) {
+        dbHelper = NoteDbHelper(context)
     }
 
-    /**
-     * Retrieve last N interaction contexts (newest first).
-     */
-    fun getRecentContexts(n: Int): List<String> {
-        val history = getHistory()
-        return history
-            .subList(0, Math.min(n, history.size))
-            .map { JSONObject(it) }
-            .map { it.getString("function") + ": " + it.getString("outcome") }
+    fun appendNote(title: String, content: String): Boolean {
+        return dbHelper.insertNote(Note(
+            title = title,
+            content = content,
+            modified = System.currentTimeMillis()
+        ))
     }
 
-    private fun getHistory(): List<String> {
-        val stored = prefs.getString(GOTCHA_KEY, "")
-        if (stored.isBlank()) return emptyList()
-        return stored.split("\n").filter { it.isNotBlank() }
+    /** Get last N notes */
+    fun getRecentNotes(count: Int): List<NoteDbHelper.Note> {
+        return dbHelper.getRecentNotes(count)
     }
 }

@@ -8,7 +8,22 @@
       module does not do. The previous README drafted a manifest requesting
       READ_PHONE_STATE / WRITE_EXTERNAL_STORAGE / a NotificationListenerService; none
       of those are used by any compiled code here, so they are deliberately absent.
+
+      The three below are for CallAudioProbeActivity ONLY. Every other activity in
+      this module — torch, tool routing, embedding router, gemma bench — works
+      without them, so they are scoped to the probe's own purpose rather than
+      granted to the whole app.
+
+      CAPTURE_AUDIO_OUTPUT is deliberately NOT requested. It is the permission that
+      would actually carry caller audio (AudioSource.VOICE_CALL / VOICE_DOWNLINK),
+      but it is signature|privileged and a normal app can never hold it. Its absence
+      is part of what the probe is measuring: those two sources are expected to fail,
+      and they are still tested so a device that permits them is discovered rather
+      than assumed away.
     -->
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <uses-feature
         android:name="android.hardware.camera.flash"
@@ -64,5 +79,37 @@
             android:name=".GemmaBenchActivity"
             android:exported="true"
             android:label="Gemma 4 E2B benchmark" />
+
+        <!-- Measures whether a third-party app can capture the caller during an
+             active carrier call. The decisive question for "can an agent talk on
+             a phone call". No launcher entry; needs the three permissions above
+             at runtime. -->
+        <activity
+            android:name=".CallAudioProbeActivity"
+            android:exported="true"
+            android:label="Call audio probe" />
+
+        <!-- Phone Assistant skills: read the screen, launch apps, tap. Requires the
+             user to grant Accessibility in Settings after install; Android never
+             grants this permission automatically. -->
+        <service
+            android:name=".PhoneSkillsService"
+            android:exported="true"
+            android:label="Phone Assistant skills"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- Phone Assistant: press-and-hold voice loop. Needs the mic, which the
+             call probe already grants app-wide. -->
+        <activity
+            android:name=".PhoneAssistantActivity"
+            android:exported="true"
+            android:label="Phone Assistant" />
     </application>
 </manifest>

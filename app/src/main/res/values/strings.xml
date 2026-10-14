@@ -9,5 +9,24 @@
     <string name="probe_capabilities">device   : %1$s %2$s\nsdk      : %3$d\nflash    : %4$s\nlitertlm : not wired (inference still simulated upstream)</string>
     <string name="probe_result">cmd=%1$s  %2$s\nlatency=%3$dus  torch_on=%4$s  commands=%5$d  max_ms=%6$d  avg_ms=%7$d</string>
     <string name="probe_hammer_done">hammer complete (of 20): failures=%1$d</string>
+    <string name="callprobe_ready">ready</string>
+    <string name="callprobe_btn_answer">answer ringing call</string>
+    <string name="callprobe_btn_selftest">self-test (calibrate mic + metrics)</string>
+    <string name="callprobe_btn_incallmode">force MODE_IN_CALL, then measure</string>
+    <string name="accessibility_skills_description">Lets Phone Assistant read what is on screen and tap on your behalf, so a spoken instruction can open an app and use it. Used only when you hold the talk button.</string>
+    <string name="assistant_ready">ready — hold the button and talk</string>
+    <string name="assistant_listening">listening…</string>
+    <string name="assistant_hold_to_talk">hold to talk</string>
+    <string name="assistant_report">latency report</string>
+    <string name="skill_list_apps">skills: list apps</string>
+    <string name="skill_read_screen">skills: read screen</string>
+    <string name="skill_open_camera">skills: open Camera</string>
+    <string name="skill_open_settings">skills: open Settings</string>
+    <string name="skill_find_tap">skills: find + tap</string>
+    <string name="callprobe_btn_monitor">monitor MIC 90s — then dial</string>
+    <string name="callprobe_btn_holdmic">hold mic 45s (stands in for Omi capture)</string>
+    <string name="callprobe_btn_normalmode">restore MODE_NORMAL</string>
+    <string name="callprobe_btn_measure">measure RMS per source</string>
+    <string name="callprobe_btn_run">run all (self-test + measure)</string>
 </resources>
 

@@ -1,0 +1,208 @@
+// QUARANTINED 2026-09-24: these lines were positioned AFTER `object ActionRegistry`
+// closed at line 393 of the original file, i.e. dead text that could never compile.
+// They are a second, longer draft of the same action map (send_email, read_message,
+// reply_message, define_my_profile, noop). Kept here for review, not deleted.
+// WARNING: this draft contains Python booleans (`success = True`, `should_speak = False`),
+// so it is a raw Python->Kotlin translation and has never been type-checked.
+// To adopt these actions: merge into ActionRegistry.actionMap, replace True/False
+// with true/false, and re-test each intent on device.
+
+        // ==============================================================
+        // EMAIL (using default email client with logged-in Google account)
+        // ==============================================================
+        "send_email" to { ctx: Context, params: Map<String, Any> ->
+            try {
+                val recipient = params["recipient"] ?: ""
+                val subject = params["subject"] ?: ""
+                val body = params["body"] ?: ""
+
+                if (recipient.isBlank() || subject.isBlank()) {
+                    return@to ActionResult(
+                        success = false,
+                        error = "Missing recipient or subject",
+                        should_speak = true,
+                        speak_text = "I need a recipient and subject"
+                    )
+                }
+
+                // Try email intent using default email client
+                // The logged-in Google account will be available in the email app
+                val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                    putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
+                    putExtra(Intent.EXTRA_SUBJECT, subject)
+                    putExtra(Intent.EXTRA_TEXT, body)
+                    setType("message/rfc822")
+                }
+
+                if (emailIntent.resolveActivity(ctx.packageManager) != null) {
+                    ctx.startActivity(emailIntent)
+                    ActionResult(
+                        success = true,
+                        output = "Email composition opened for $recipient",
+                        should_speak = true,
+                        speak_text = "Email composition opened"
+                    )
+                } else {
+                    ActionResult(
+                        success = false,
+                        error = "No email app found",
+                        should_speak = true,
+                        speak_text = "Sorry, I couldn't open email composition"
+                    )
+                }
+            } catch (e: Exception) {
+                ActionResult(
+                    success = false,
+                    error = "Send email failed: ${e.message}",
+                    should_speak = true,
+                    speak_text = "Sorry, I couldn't compose the email"
+                )
+            }
+        },
+
+        // ==============================================================
+        // FALLBACK / NO-OP
+        // ==============================================================
+
+        // ==============================================================
+        // READ INCOMING MESSAGE
+        // ==============================================================
+        "read_message" to { ctx: Context, params: Map<String, Any> ->
+            try {
+                // Read the most recent message from the SMS provider
+                val contentResolver = ctx.contentResolver
+                val smsUri = "content://sms/inbox"
+                val cursor = contentResolver.query(
+                    smsUri,
+                    projection = arrayOf("body", "address", "date", "type"),
+                    selection = null,
+                    selectionArgs = null,
+                    orderBy = "date DESC"
+                )
+
+                var latestMessage = "No recent messages"
+                if (cursor.moveToFirst()) {
+                    val body = cursor.getString(cursor.getColumnIndexOrThrow("body"))
+                    val address = cursor.getString(cursor.getColumnIndexOrThrow("address"))
+                    val date = cursor.getLong(cursor.getColumnIndexOrThrow("date"))
+                    latestMessage = "From: $address\nMessage: $body\nDate: ${System.currentTimeMillis()}"
+                    cursor.close()
+                }
+
+                return@to ActionResult(
+                    success = true,
+                    output = latestMessage,
+                    should_speak = true,
+                    speak_text = "You have a new message: ${body?.take(50) ?: \"\"}"
+                )
+            } catch (e: Exception) {
+                ActionResult(
+                    success = false,
+                    error = "Read message failed: ${e.message}",
+                    should_speak = true,
+                    speak_text = "Sorry, I couldn't read your messages"
+                )
+            }
+        },
+
+        // ==============================================================
+        // REPLY TO MESSAGE
+        // ==============================================================
+        "reply_message" to { ctx: Context, params: Map<String, Any> ->
+            try {
+                val replyText = params["reply_text"] ?: ""
+
+                if (replyText.isBlank()) {
+                    return@to ActionResult(
+                        success = False,
+                        error = "No reply text provided",
+                        should_speak = True,
+                        speak_text = "What would you like to say?"
+                    )
+                }
+
+                // Get the most recent message sender from the last read_message call
+                // (stored in shared preferences or memory)
+                val storedSender = "contact"  // Placeholder - in production, retrieve from memory
+                val storedMessage = "sample message"  // Placeholder
+
+                // Send the reply via SMS intent
+                val replyIntent = Intent(Intent.ACTION_SEND).apply {
+                    putExtra("sms_body", replyText)
+                    putExtra("address", storedSender)
+                }.setType("vnd.android-dir/mms-sms")
+
+                if (replyIntent.resolveActivity(ctx.packageManager) != null) {
+                    ctx.startActivity(replyIntent)
+                    ActionResult(
+                        success = True,
+                        output = "Reply composition opened for $storedSender",
+                        should_speak = True,
+                        speak_text = "Reply composition opened"
+                    )
+                } else {
+                    ActionResult(
+                        success = False,
+                        error = "No SMS app found",
+                        should_speak = True,
+                        speak_text = "Sorry, I couldn't open message composition"
+                    )
+                }
+            } catch (e: Exception) {
+                ActionResult(
+                    success = False,
+                    error = "Reply message failed: ${e.message}",
+                    should_speak = True,
+                    speak_text = "Sorry, I couldn't compose your reply"
+                )
+            }
+        },
+
+        // ==============================================================
+        // DEFINE MY PERSONA/SHI
+        // ==============================================================
+        "define_my_profile" to { ctx: Context, params: Map<String, Any> ->
+            try {
+                val profile = mapOf(
+                    "name" to "User",  // Would be retrieved from user profile
+                    "nickname" to "User",  // Nickname the agent uses
+                    "preferred_name" to "User",  // How the agent addresses the user
+                    "favorite_commands" to listOf("open flashlight", "check calendar", "set alarm"),
+                    "communication_style" to "direct and concise"
+                )
+
+                // Store profile in memory for future reference
+                memory.store(
+                    input = "Profile definition",
+                    function = "define_my_profile",
+                    outcome = "Profile stored",
+                    speakText = "My profile has been defined",
+                    shouldSpeak = True
+                )
+
+                ActionResult(
+                    success = True,
+                    output = "My profile: Name: ${profile[name]}, Nickname: ${profile[nickname]}",
+                    shouldSpeak = True,
+                    speakText = "My profile has been defined"
+                )
+            } catch (e: Exception) {
+                ActionResult(
+                    success = False,
+                    error = "Define profile failed: ${e.message}",
+                    shouldSpeak = True,
+                    speakText = "Sorry, I couldn't define your profile"
+                )
+            }
+        },
+
+        // ==============================================================
+        // NO-OP FALLBACK
+        // ==============================================================
+        "noop" to { ctx: Context, params: Map<String, Any> ->
+            ActionResult(
+                success = True,
+                output = "No action required",
+                should_speak = False
+            )
+        }

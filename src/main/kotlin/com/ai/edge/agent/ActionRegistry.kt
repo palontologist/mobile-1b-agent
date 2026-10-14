@@ -51,7 +51,7 @@ data class ActionResult(
  */
 object ActionRegistry {
 
-    private val logger = Log.getLogger("ActionRegistry") // Note: actual usage below
+    private const val TAG = "ActionRegistry"
 
     // -----------------------------------------------------------------
     // Core action mappings: functionName → execute function
@@ -59,54 +59,42 @@ object ActionRegistry {
 
     private val actionMap = mutableMapOf<String, (Context, Map<String, Any>) -> ActionResult>(
         // ==============================================================
-        // FLASHLIGHT (PROVEN WORKING on SM-A14)
+        // FLASHLIGHT — real implementation: CameraManager.setTorchMode()
+        // See TorchManager.kt in the :app module for the platform call and
+        // its failure taxonomy (unsupported / camera-busy / failed).
         // ==============================================================
         "open_flashlight" to { ctx: Context, params: Map<String, Any> ->
-            try {
-                val tm = ctx.getSystemService(TorchService::class.java) as TorchManager
-                val currentlyOn = tm.isTorchOn
-                if (currentlyOn) {
-                    ActionResult(
-                        success = true,
-                        output = "Flashlight already on",
-                        should_speak = false
-                    )
-                } else {
-                    tm.enableTorch()
-                    ActionResult(
-                        success = true,
-                        output = "Flashlight turned on",
-                        should_speak = true,
-                        speak_text = "Flashlight turned on"
-                    )
-                }
-            } catch (e: Exception) {
-                // NPU crash fallback: try CPU, or report error
-                ActionResult(
+            when (val s = TorchManager.enable(ctx)) {
+                is TorchStatus.TurnedOn, is TorchStatus.AlreadyOn -> ActionResult(
+                    success = true,
+                    output = s.describe(),
+                    should_speak = s is TorchStatus.TurnedOn,
+                    speak_text = "Flashlight turned on"
+                )
+                else -> ActionResult(
                     success = false,
-                    error = "Flashlight failed: ${e.message}",
+                    output = s.describe(),
+                    error = s.describe(),
                     should_speak = true,
-                    speak_text = "Sorry, flashlight could not be turned on"
+                    speak_text = "Sorry, the flashlight is not available"
                 )
             }
         },
 
         "close_flashlight" to { ctx: Context, params: Map<String, Any> ->
-            try {
-                val tm = ctx.getSystemService(TorchService::class.java) as TorchManager
-                tm.disableTorch()
-                ActionResult(
+            when (val s = TorchManager.disable(ctx)) {
+                is TorchStatus.TurnedOff, is TorchStatus.AlreadyOff -> ActionResult(
                     success = true,
-                    output = "Flashlight turned off",
-                    should_speak = true,
+                    output = s.describe(),
+                    should_speak = s is TorchStatus.TurnedOff,
                     speak_text = "Flashlight turned off"
                 )
-            } catch (e: Exception) {
-                ActionResult(
+                else -> ActionResult(
                     success = false,
-                    error = "Flashlight failed: ${e.message}",
+                    output = s.describe(),
+                    error = s.describe(),
                     should_speak = true,
-                    speak_text = "Sorry, flashlight could not be turned off"
+                    speak_text = "Sorry, the flashlight could not be turned off"
                 )
             }
         },
@@ -353,10 +341,11 @@ object ActionRegistry {
         parameters: Map<String, Any> = emptyMap(),
         ctx: Context
     ): ActionResult {
-        val action = actionMap[functionName] ?: {
-            // Unknown function - return no-op instead of crashing
-            logger.w { "Unknown FunctionGemma function: $functionName" }
-            return@to ActionResult(
+        // Unknown function -> no-op instead of a crash. The original used an elvis
+        // with a lambda literal containing `return@to`, which is not resolvable here.
+        val action = actionMap[functionName] ?: run {
+            Log.w(TAG, "Unknown FunctionGemma function: $functionName")
+            return ActionResult(
                 success = true,
                 output = "That action is not supported yet",
                 should_speak = true,
@@ -384,10 +373,13 @@ object ActionRegistry {
         return actionMap.containsKey(functionName)
     }
 
-    // Initialize logger properly
-    init {
-        logger.info = { message: String ->
-            // Silent by default - can be replaced with Android Log
-        }
-    }
+    /**
+     * Diagnostic summary for logging / onboarding: which skills exist and whether the
+     * device can actually serve them.
+     */
+    @JvmStatic
+    fun capabilityReport(ctx: Context): Map<String, String> = mapOf(
+        "registered" to getRegisteredFunctions().joinToString(","),
+        "flash_available" to TorchManager.isAvailable(ctx).toString()
+    )
 }

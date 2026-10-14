@@ -1,4 +1,3 @@
-tensorflow>=2.15.0
-torch>=2.2.0
-numpy>=1.24.0
-```
+# Python harness for app.py. The Android build needs none of this.
+tflite-runtime==2.14.0
+numpy>=1.24.0,<2

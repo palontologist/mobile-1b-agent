@@ -178,6 +178,93 @@ serial is taken as an argument and never hardcoded, so no identifier is committe
 "torch service" to cast, and `CameraManager.setTorchMode()` requires **no**
 `CAMERA` permission — which is why the new manifest asks for none.
 
+## Can an agent talk on a phone call? (`CallAudioProbeActivity`)
+
+A separate measurement rig, added for an Omi question rather than a model one: **if
+an agent answers a carrier phone call, can it actually hear the caller?**
+
+The app can answer (`TelecomManager.acceptRingingCall()`, `ANSWER_PHONE_CALLS`) and
+can speak through the speaker. The open question is capture, and Android makes it
+genuinely uncertain rather than obviously no:
+
+- `AudioSource.VOICE_CALL` / `VOICE_DOWNLINK` are the sources that would carry the
+  caller, and both need `CAPTURE_AUDIO_OUTPUT` — signature|privileged, which a
+  normal app can never hold. **Not requested here**, and its absence is part of what
+  is being measured.
+- `MIC` / `VOICE_RECOGNITION` / `VOICE_COMMUNICATION` need no special permission,
+  but telephony holds `MODE_IN_CALL` during an active call and may starve them.
+
+Same rule as the torch probe: **success is measured RMS amplitude, never "the stream
+opened."** `startRecording()` and `recordingState == RECORDING` both succeed on a
+stream that yields pure silence, which is precisely the false pass that matters here.
+`recordingState` is logged alongside RMS so a silent-but-"recording" stream is visible
+as such.
+
+### Run it — solo, with an outbound call to an IVR
+
+The decisive question is whether **telephony** starves the mic during an active
+call, not whether a *specific call* does. That mechanism (`MODE_IN_CALL` plus
+telephony-held audio focus) is identical inbound and outbound, so **you do not need
+a second phone** — you need any real call connected with audible sound on the far
+end.
+
+Best solo subject: your **carrier's own voicemail**, or a bank IVR, or a
+time-and-weather line. Something that answers and speaks or beeps.
+
+```bash
+./gradlew :app:assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb logcat -c
+adb logcat -v epoch CallProbe:V '*:S'
+adb shell am start -n com.ai.edge.agent/.CallAudioProbeActivity
+```
+
+1. Grant the three permissions.
+2. Press **"self-test (calibrate mic + metrics)"**. Room quiet. Must read
+   `PIPELINE=OK`. **If this says BROKEN, stop** — a later zero reading would mean
+   nothing.
+3. Place a normal outgoing call to the IVR from the phone's own dialler. Wait until
+   it connects and you can hear it.
+4. Press **"measure RMS per source"** while the far end is talking.
+
+### Why the self-test is not optional
+
+Without it, `rms=0` during a call is ambiguous between *"Android blocked the mic"*
+and *"this probe is measuring nothing."* The self-test removes that ambiguity:
+
+```
+[CALLPROBE] self_test phase=A (silence) source=MIC
+[CALLPROBE] src=SELFTEST_A_silence rms=0.4 peak=12
+[CALLPROBE] self_test phase=B (440Hz @ full volume through speaker)
+[CALLPROBE] src=SELFTEST_B_tone rms=4210.7 peak=31002
+[CALLPROBE] === SELFTEST END silence=0.4 tone=4210.7 PIPELINE=OK — mic+metrics work, a zero during a call is the platform ===
+```
+
+Silent A plus loud B proves the acoustic loop and the RMS maths both work. Now a
+zero during a connected call is attributable to the platform, not the rig.
+
+### Reading the result
+
+| Reading | Meaning |
+|---|---|
+| Self-test `PIPELINE=BROKEN` | The rig is at fault. Fix that before drawing any conclusion about Android. |
+| Any source `USABLE` (rms ≥ 300) **during a connected call** | The speakerphone path is viable. Next blocker is turn latency — `/v4/listen` delivers its trailing FINAL segment ~1.8s late, which is tolerable for push-to-talk and fatal for a phone conversation. |
+| Every source `SILENT` (0 < rms < 1) during a connected call | Telephony starves the mic. **The speakerphone conversation path is dead**; an agent can only talk on a call path Omi itself controls (its own Twilio number). |
+| `UNAVAILABLE` on the two privileged sources | Expected and not the whole story — `VOICE_CALL`/`VOICE_DOWNLINK` need `CAPTURE_AUDIO_OUTPUT`, which no normal app holds. Judge the verdict on `MIC` / `VOICE_RECOGNITION` / `VOICE_COMMUNICATION`. |
+
+Then confirm inbound with a second phone if you want: call the device, press
+**"answer ringing call"**, measure. Same expected numbers — inbound exists only to
+exercise the answer path, not to reach a different verdict.
+
+### What will not work, so you don't waste time on it
+
+- **Android emulator.** It can simulate an incoming call
+  (`adb emu gsm call 5555555`), but emulator audio is synthetic and it does not
+  model telephony audio focus. It is fine for checking that this probe compiles and
+  logs, and worthless for the decisive question.
+- **`service call phone`, root, or hidden APIs** to fake a call on a real device.
+  Not available to a normal app, and it would not reproduce the real focus path.
+
 ## Remaining path to the original goal
 
 1. Build + install the probe, capture the first `measurements/` bundle.
@@ -232,6 +319,7 @@ Interpreter(model_path='assets/model.tflite')"
 ### Phase 1 — Foundation
 - [x] `TorchManager` on `CameraManager.setTorchMode()` — real, in `:app`
 - [x] Gradle module, manifest, probe activity, evidence script
+- [x] `CallAudioProbeActivity` — measures whether a third-party app can capture the caller during an active carrier call (see above; needs only the device plus any call that answers with sound)
 - [x] `ActionRegistry.kt`: 8 actions, each error-wrapped; flashlight rewired to `TorchManager`
 - [x] `NoteDatabase.kt`: SQLite persistence (replaces SharedPreferences design)
 - [x] Python inference harness (`app.py`) functional for valid models
@@ -280,11 +368,24 @@ contribution:
 
 ## Permissions
 
-The shipped `:app` manifest requests **none**, and that is deliberate:
-`CameraManager.setTorchMode()` and `getCameraCharacteristics()` are permission-free
-on API 23+. The previously drafted manifest asked for `READ_PHONE_STATE`,
-`WRITE_EXTERNAL_STORAGE`, `FOREGROUND_SERVICE` and a `NotificationListenerService`
-that no code implements; `allowBackup="false"`.
+The `:app` manifest requests **three**, and only for `CallAudioProbeActivity`:
+`ANSWER_PHONE_CALLS`, `READ_PHONE_STATE` and `RECORD_AUDIO`. Every other compiled
+activity — torch, tool routing, embedding router, gemma bench — needs none of them,
+which is deliberate: `CameraManager.setTorchMode()` and `getCameraCharacteristics()`
+are permission-free on API 23+.
+
+`CAPTURE_AUDIO_OUTPUT` is **not** requested and cannot be: it is signature|privileged,
+and it is the only permission that would carry real caller audio. Its absence is the
+thing the call probe is measuring. See [Can an agent talk on a
+phone call?](#can-an-agent-talk-on-a-phone-call-callaudioprobeactivity).
+
+The remaining permissions in the built manifest (`FOREGROUND_SERVICE`, `WAKE_LOCK`,
+`ACCESS_NETWORK_STATE`, `RECEIVE_BOOT_COMPLETED`) are merged in by the LiteRT AARs,
+not requested by this source.
+
+The previously drafted manifest also asked for `WRITE_EXTERNAL_STORAGE` and a
+`NotificationListenerService` that no code implements; both remain absent, and
+`allowBackup="false"`.
 
 Skills still in the legacy tree will need these when they are moved into `:app`:
 

@@ -77,4 +77,13 @@ dependencies {
     // work, but the recipe's on-device discipline uses CompiledModel so a CPU run
     // and a GPU run share one code path).
     implementation("com.google.ai.edge.litert:litert:2.1.0")
+
+    // On-device STT. sherpa-onnx does the compute; there is no NDK work of our own.
+    //
+    // LICENSING, deliberately flagged: this AAR is built from upstream sherpa-onnx,
+    // which is Apache-2.0, BUT it bundles espeak-ng (GPL-3.0) for TTS phonemisation.
+    // Only the ASR path is used here and espeak is never invoked — however linking
+    // the library is still linking it. That is fine for personal/experimental use and
+    // is a blocker for any redistributed product build. See README "Licensing".
+    implementation("com.github.k2-fsa.sherpa-onnx:sherpa-onnx:v1.13.5")
 }

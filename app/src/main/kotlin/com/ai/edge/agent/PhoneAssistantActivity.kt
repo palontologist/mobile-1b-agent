@@ -51,7 +51,13 @@ class PhoneAssistantActivity : Activity() {
         private const val SAMPLE_RATE = 16000
         private const val CHANNEL = AudioFormat.CHANNEL_IN_MONO
         private const val ENCODING = AudioFormat.ENCODING_PCM_16BIT
-        private const val RMS_FLOOR = 400.0
+        // Measured, then corrected. Silence on this device reads 34-74 RMS; a first
+        // real utterance read 229. An initial floor of 400 was WRONG: it classified
+        // normal speech as silence and silently skipped STT entirely (stt_ms=0). 120
+        // sits above the observed noise floor and well below observed speech, and
+        // the threshold is logged with every turn so this is visible rather than
+        // inferred.
+        private const val RMS_FLOOR = 120.0
 
         private const val TTS_IDLE = android.speech.tts.TextToSpeech.QUEUE_FLUSH
     }
@@ -59,6 +65,7 @@ class PhoneAssistantActivity : Activity() {
     private lateinit var statusText: TextView
     private lateinit var transcriptText: TextView
     private var tts: TextToSpeech? = null
+    private var stt: SherpaStt? = null
     private var ttsReady = false
     private var recording = false
     private var recordingThread: Thread? = null
@@ -170,6 +177,16 @@ class PhoneAssistantActivity : Activity() {
         })
 
         setContentView(ScrollView(this).apply { addView(root) })
+
+        Thread {
+            val engine = SherpaStt(this)
+            if (engine.load()) {
+                stt = engine
+                statusText.post { statusText.text = "ready — STT loaded (${engine.loadMs()}ms)" }
+            } else {
+                statusText.post { statusText.text = "ready — STT unavailable, replies stay canned" }
+            }
+        }.also { it.isDaemon = true; it.start() }
 
         tts = TextToSpeech(this) { status ->
             ttsReady = status == TextToSpeech.SUCCESS
@@ -304,10 +321,30 @@ class PhoneAssistantActivity : Activity() {
             }
         }
 
-        val reply = if (heardSomething) {
-            "I heard you. Speech recognition is not wired up yet, so this reply is canned."
+        // Decode what was actually said. This is the piece that turns a canned
+        // reply into a real one; empty result is common on an int8 transducer and is
+        // NOT an error, so it gets its own wording rather than the error branch.
+        val decodeStart = SystemClock.elapsedRealtime()
+        val transcript = if (heardSomething) {
+            val raw = readAllBytes(pcm)
+            stt?.transcribe(raw).orEmpty()
         } else {
-            "I did not hear anything. Hold the button and speak while it is held."
+            ""
+        }
+        val decodeMs = SystemClock.elapsedRealtime() - decodeStart
+
+        statusText.post {
+            statusText.text = if (heardSomething) {
+                "turn $id · heard (rms ${"%.0f".format(rms)}) · STT ${decodeMs}ms · \"$transcript\""
+            } else {
+                "turn $id · silence (rms ${"%.0f".format(rms)}) · ${recordMs}ms"
+            }
+        }
+
+        val reply = when {
+            !heardSomething -> "I did not hear anything. Hold the button and speak while it is held."
+            transcript.isEmpty() -> "I heard something but could not make out any words."
+            else -> "You said: $transcript"
         }
 
         // Measured from the end of capture, so this is a real latency rather than an
@@ -320,7 +357,8 @@ class PhoneAssistantActivity : Activity() {
         Log.i(
             TAG,
             "turn_end id=$id record_ms=$recordMs rms=${"%.1f".format(rms)} " +
-                "playback_ms=$playbackMs reply_wait_ms=$speakMs heard=$heardSomething " +
+                "playback_ms=$playbackMs stt_ms=$decodeMs reply_wait_ms=$speakMs " +
+                "heard=$heardSomething transcript=\"${transcript.take(60)}\" " +
                 "end_to_end_ms=${SystemClock.elapsedRealtime() - t0}"
         )
         // Cache files accumulate one pair per turn; this is a probe, not a feature,
@@ -328,6 +366,8 @@ class PhoneAssistantActivity : Activity() {
         pcm.delete()
         wav.delete()
     }
+
+    private fun readAllBytes(f: File): ByteArray = if (f.exists()) f.readBytes() else ByteArray(0)
 
     private fun writeWav(pcmFile: File, wavFile: File) {
         val dataSize = pcmFile.length().toInt()
